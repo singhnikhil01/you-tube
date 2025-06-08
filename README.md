@@ -45,7 +45,7 @@ This project is built using the following key technologies and libraries:
 *   @hookform/resolvers (for form validation)
 *   @neondatabase/serverless (for database interactions)
 *   @radix-ui/* (various components like accordion, alert-dialog, aspect-ratio, avatar, checkbox, etc.)
-*   Drizzle ORM (indicated by `drizzle.config.ts`)
+*   Drizzle ORM 
 *   And many more...
 
 ## Installation
@@ -87,16 +87,3 @@ For production build:
 bun run build
 bun run start
 ```
-
-## Contributing
-
-Contributions are welcome! Please feel free to open an issue to discuss a new feature or bug, or submit a pull request.
-1.  Fork the Project
-2.  Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3.  Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4.  Push to the Branch (`git push origin feature/AmazingFeature`)
-5.  Open a Pull Request
-
-## License
-
-License information was not automatically detected. Please add license details to this section.
