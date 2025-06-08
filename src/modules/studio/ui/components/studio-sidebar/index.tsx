@@ -6,6 +6,7 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import React from "react";
 import { Separator } from "@/components/ui/separator";
@@ -17,13 +18,14 @@ import { LogOutIcon, VideoIcon } from "lucide-react";
 import { StudioSidebarHeader } from "./studio-sidebar-header";
 
 export const StudioSidebar = () => {
+  const { state } = useSidebar();
   const pathname = usePathname();
   return (
-    <Sidebar className=" z-40  border-r shadow-md " collapsible="icon"  >{/**collapsible="icon"  */}
+    <Sidebar className={state==="collapsed" ? "z-40" : "z-40 border-none"}  collapsible="icon"  >{/**collapsible="icon"  */}
       <SidebarContent className="bg-white ">
-        <div className="flex items-center flex-shrink-0">
+        <div  className={state==="collapsed" ? "invisible" : "flex items-center flex-shrink-0"}>
           <SidebarTrigger />
-          <Link href="/">
+          <Link href="/studio" >
             <div className="p-4 flex items-center gap-1">
               <Image src="./logo.svg" height={32} width={32} alt="log0" />
               <p className="text-xl font-semibold tracking-tight">Studio</p>
