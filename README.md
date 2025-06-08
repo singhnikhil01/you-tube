@@ -1,36 +1,102 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# new-tube
 
-## Getting Started
+[![Built with TypeScript](https://img.shields.io/badge/Built%20with-TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Built with React](https://img.shields.io/badge/Built%20with-React-61DAFB?style=for-the-badge&logo=react&logoColor=white)](https://reactjs.org/)
+[![Styled with Tailwind CSS](https://img.shields.io/badge/Styled%20with-Tailwind%20CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![Built with Node.js](https://img.shields.io/badge/Built%20with-Node.js-339933?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
+[![Language](https://img.shields.io/badge/Language-TypeScript-yellow.svg?style=for-the-badge)](https://en.wikipedia.org/wiki/Programming_language)
+[![Version](https://img.shields.io/badge/version-TypeScript-blue.svg?style=for-the-badge)]()
 
-First, run the development server:
+`new-tube` is a project aimed at creating a functional clone of the popular video-sharing platform, YouTube. It leverages modern web technologies to provide a responsive and interactive user experience.
+
+## Table of Contents
+
+- [Features](#features)
+- [Technologies Used](#technologies-used)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Contributing](#contributing)
+- [License](#license)
+
+## Features
+
+Based on the project description and included technologies, `new-tube` is being built with features common to video-sharing platforms. Potential features include:
+
+*   User Authentication (powered by Clerk)
+*   Video Upload and Management
+*   Video Playback
+*   Comment Section
+*   Search Functionality
+*   Responsive Design
+*   Database Integration (using Neon serverless database)
+
+*(Note: The exact implemented features may vary based on the current development state.)*
+
+## Technologies Used
+
+This project is built using the following key technologies and libraries:
+
+*   TypeScript
+*   Node.js
+*   Next.js (implicitly used via `create-next-app` and project structure)
+*   React (implicitly used via Next.js)
+*   Tailwind CSS
+*   @clerk/nextjs (for authentication)
+*   @hookform/resolvers (for form validation)
+*   @neondatabase/serverless (for database interactions)
+*   @radix-ui/* (various components like accordion, alert-dialog, aspect-ratio, avatar, checkbox, etc.)
+*   Drizzle ORM (indicated by `drizzle.config.ts`)
+*   And many more...
+
+## Installation
+
+To get a local copy up and running, follow these steps:
+
+1.  Clone the repository:
+    ```bash
+    git clone https://github.com/your-username/new-tube.git # Replace with actual repo URL
+    ```
+2.  Navigate to the project directory:
+    ```bash
+    cd new-tube
+    ```
+3.  Install dependencies using Bun:
+    ```bash
+    bun install
+    ```
+4.  Set up environment variables. You will likely need configuration for Clerk, Neon Database, Ngrok (for webhooks), etc. Create a `.env.local` file in the root directory and add necessary variables (refer to `.env.example` if available, or relevant documentation for the used services).
+
+## Usage
+
+To run the project locally:
+
+*   For basic development server:
+    ```bash
+    bun run dev
+    ```
+    Open [http://localhost:3000](http://localhost:3000) in your browser.
+*   If your application relies on webhooks (e.g., for Clerk or other services) and requires a publicly accessible URL for local development, you may need to run the webhook tunnel alongside the development server. A convenience script `dev:all` is provided:
+    ```bash
+    bun run dev:all
+    ```
+    *(Note: The `dev:webhook` script currently uses a hardcoded ngrok URL (`dashing-flamingo-vastly.ngrok-free.app`). You may need to configure Ngrok or a similar tool and update the script or `.env` variables accordingly).*
+
+For production build:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+bun run build
+bun run start
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Contributing
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Contributions are welcome! Please feel free to open an issue to discuss a new feature or bug, or submit a pull request.
+1.  Fork the Project
+2.  Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3.  Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4.  Push to the Branch (`git push origin feature/AmazingFeature`)
+5.  Open a Pull Request
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## License
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+License information was not automatically detected. Please add license details to this section.
