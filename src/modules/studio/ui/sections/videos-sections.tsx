@@ -33,11 +33,9 @@ export const VideosSectionSuspense = () => {
       getNextPageParam: (lastPage) => lastPage.nextCursor,
     }
   );
-  console.log(query.hasNextPage, query.isFetchingNextPage);
+
   return (
     <div>
-      {/* {JSON.stringify(data)} */}
-
       <div className="border-y">
         <Table>
           <TableHeader>
@@ -55,7 +53,11 @@ export const VideosSectionSuspense = () => {
             {videos.pages
               .flatMap((page) => page.items)
               .map((video) => (
-                <Link href={`/studio/videos/${video.id}`} key={video.id} legacyBehavior>
+                <Link
+                  href={`/studio/videos/${video.id}`}
+                  key={video.id}
+                  legacyBehavior
+                >
                   <TableRow className="cursor-pointer">
                     <TableCell>{video.title}</TableCell>
                     <TableCell>Visiblity</TableCell>
