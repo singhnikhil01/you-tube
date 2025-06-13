@@ -7,6 +7,12 @@ import { eq, and, or, lt, desc } from "drizzle-orm";
 // import { TRPCError } from "@trpc/server";
 
 export const studioRouter = createTRPCRouter({
+  getOne:protectedProcedure.input(z.string().uuid()).query(async ({ ctx, input }) => {
+
+
+  }),
+
+
   getMany: protectedProcedure
     .input(
       z.object({
