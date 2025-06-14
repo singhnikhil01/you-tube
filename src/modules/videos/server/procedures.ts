@@ -1,12 +1,8 @@
 import { db } from "@/db";
-// import { z } from "zod";
 import { videos, VideoUpdateSchema } from "@/db/schema";
 import { mux } from "@/lib/mux";
 import { protectedProcedure, createTRPCRouter } from "@/trpc/init";
 import { and, eq } from "drizzle-orm";
-// import { TRPCError } from "@trpc/server";
-// import { eq, and, or, lt, desc } from "drizzle-orm";
-
 import { TRPCError } from "@trpc/server";
 import z from "zod";
 

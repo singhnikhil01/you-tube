@@ -1,0 +1,45 @@
+import { db } from "@/db";
+import { users, videos } from "@/db/schema";
+import { auth } from "@clerk/nextjs/server";
+import { createUploadthing, type FileRouter } from "uploadthing/next";
+import { UploadThingError } from "uploadthing/server";
+import { z } from "zod";
+import { and, eq } from "drizzle-orm";
+
+const f = createUploadthing();
+
+export const ourFileRouter = {
+  thumbnailUploader: f({
+    image: {
+      maxFileSize: "4MB",
+      maxFileCount: 1,
+    },
+  })
+    .input(z.object({ videoId: z.string() }))
+    .middleware(async ({ input }) => {
+      const { userId : clerkUserId } = await auth();
+      if (!clerkUserId) throw new UploadThingError("Unauthorized");
+      const [user] = await db 
+      .select()
+      .from(users).
+      where(eq(users.clerkId, clerkUserId));
+
+      if (!user) throw new UploadThingError("User not found");
+      return { user, ...input };
+    })
+    .onUploadComplete(async ({ file, metadata }) => {
+      await db
+        .update(videos)
+        .set({ thumbnailUrl: file.ufsUrl })
+        .where(
+          and( 
+            eq(videos.id, metadata.videoId),
+            eq(videos.userId, metadata.user.id)
+          )
+        );
+
+      return { uploadedBy: metadata.user.id };
+    }),
+} satisfies FileRouter;
+
+export type OurFileRouter = typeof ourFileRouter;
