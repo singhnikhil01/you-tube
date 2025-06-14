@@ -54,7 +54,7 @@ To get a local copy up and running, follow these steps:
 
 1.  Clone the repository:
     ```bash
-    git clone https://github.com/your-username/new-tube.git # Replace with actual repo URL
+    git clone https://github.com/singhnikhil01/new-tube.git # Replace with actual repo URL
     ```
 2.  Navigate to the project directory:
     ```bash
@@ -72,7 +72,7 @@ To run the project locally:
 
 *   For basic development server:
     ```bash
-    bun run dev
+    bun run dev:all
     ```
     Open [http://localhost:3000](http://localhost:3000) in your browser.
 *   If your application relies on webhooks (e.g., for Clerk or other services) and requires a publicly accessible URL for local development, you may need to run the webhook tunnel alongside the development server. A convenience script `dev:all` is provided:
