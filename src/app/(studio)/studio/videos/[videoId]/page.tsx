@@ -1,7 +1,23 @@
+import { VideoViews } from "@/modules/studio/ui/views/video-view";
+import { HydrateClient, trpc } from "@/trpc/server";
 import React from "react";
 
-const page = () => {
-  return <div>video ID</div>;
+export const dynamic = "force-dynamic";
+
+interface PageProps {
+  params: Promise<{ videoId: string }>;
+}
+
+const page = async ({ params }: PageProps) => {
+  const { videoId } = await params;
+  void trpc.studio.getOne.prefetch({ id: videoId });
+  void trpc.categories.getMany.prefetch();
+
+  return (
+    <HydrateClient>
+      <VideoViews videoId={videoId} />
+    </HydrateClient>
+  );
 };
 
 export default page;

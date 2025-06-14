@@ -9,6 +9,12 @@ import {
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
+import {
+  createInsertSchema,
+  createSelectSchema,
+  createUpdateSchema,
+} from "drizzle-zod";
+
 export const users = pgTable(
   "users",
   {
@@ -55,11 +61,11 @@ export const videos = pgTable("videos", {
   muxUploadId: text("mux_upload_id").unique(),
   muxPlaybackId: text("mux_playback_id").unique(),
   muxTrackId: text("mux_trace_id").unique(),
-  mux_TrackStatus: text("mux_track_status"),
+  muxTrackStatus: text("mux_track_status"),
   thumbnailUrl: text("thumbnail_url"),
   previewUrl: text("preview_url"),
   duration: integer("duration").default(0).notNull(),
-  visiblity: videoVisiblity("visibility").default("private").notNull(),
+  visibility: videoVisiblity("visibility").default("private").notNull(),
   userId: uuid("user_id")
     .references(() => users.id, { onDelete: "cascade" })
     .notNull(),
@@ -69,6 +75,10 @@ export const videos = pgTable("videos", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
+
+export const VideoInsertSchema = createInsertSchema(videos);
+export const VideoSelectSchema = createSelectSchema(videos);
+export const VideoUpdateSchema = createUpdateSchema(videos);
 
 export const VideoRelations = relations(videos, ({ one }) => ({
   user: one(users, {

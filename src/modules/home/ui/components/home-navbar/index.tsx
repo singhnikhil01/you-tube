@@ -13,7 +13,7 @@ export const HomeNavbar = () => {
           <SidebarTrigger />
           <Link href="/">
             <div className="p-4 flex items-center gap-1">
-              <Image src="./logo.svg" height={32} width={32} alt="log0" />
+              <Image src="/logo.svg" height={32} width={32} alt="log0" />
               <p className="text-xl font-semibold tracking-tight">NewTube</p>
             </div>
           </Link>

@@ -11,7 +11,7 @@ import { Toaster } from "@/components/ui/sonner";
 export const metadata: Metadata = {
   title: "NewTube",
   description: "Youtube Clone",
-  icons: "./logo.svg",
+  icons: "/logo.svg",
 };
 
 export default function RootLayout({

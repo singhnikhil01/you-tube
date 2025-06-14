@@ -144,12 +144,12 @@ export const VideosSectionSuspense = () => {
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center">
-                        {video.visiblity == "private" ? (
+                        {video.visibility == "private" ? (
                           <LockIcon className="size-4 mr-2" />
                         ) : (
-                          <Globe2Icon />
+                          <Globe2Icon className="size-4 mr-2" /> 
                         )}
-                        {snakeCaseToTitle(video.visiblity)}
+                        {snakeCaseToTitle(video.visibility)}
                       </div>
                     </TableCell>
                     <TableCell>
