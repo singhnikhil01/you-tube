@@ -2,7 +2,7 @@ import { db } from "@/db";
 import { users, videos } from "@/db/schema";
 import { auth } from "@clerk/nextjs/server";
 import { createUploadthing, type FileRouter } from "uploadthing/next";
-import { UploadThingError } from "uploadthing/server";
+import { UploadThingError, UTApi } from "uploadthing/server";
 import { z } from "zod";
 import { and, eq } from "drizzle-orm";
 
@@ -17,12 +17,33 @@ export const ourFileRouter = {
   })
     .input(z.object({ videoId: z.string() }))
     .middleware(async ({ input }) => {
-      const { userId : clerkUserId } = await auth();
+      const { userId: clerkUserId } = await auth();
       if (!clerkUserId) throw new UploadThingError("Unauthorized");
-      const [user] = await db 
-      .select()
-      .from(users).
-      where(eq(users.clerkId, clerkUserId));
+
+      const [user] = await db
+        .select()
+        .from(users)
+        .where(eq(users.clerkId, clerkUserId));
+
+      const [existingVideo] = await db
+        .select({
+          thumbnailKey: videos.thumbnailKey,
+        })
+        .from(videos)
+        .where(and(eq(videos.id, input.videoId), eq(videos.userId, user.id)));
+
+      if (!existingVideo) {
+        throw new UploadThingError("Not found ");
+      }
+      if (existingVideo.thumbnailKey) {
+        const utapi = new UTApi();
+
+        await utapi.deleteFiles(existingVideo.thumbnailKey);
+        await db
+          .update(videos)
+          .set({ thumbnailKey: null, thumbnailUrl: null })
+          .where(and(eq(videos.id, input.videoId), eq(videos.userId, user.id)));
+      }
 
       if (!user) throw new UploadThingError("User not found");
       return { user, ...input };
@@ -30,9 +51,12 @@ export const ourFileRouter = {
     .onUploadComplete(async ({ file, metadata }) => {
       await db
         .update(videos)
-        .set({ thumbnailUrl: file.ufsUrl })
+        .set({
+          thumbnailUrl: file.ufsUrl,
+          thumbnailKey: file.key,
+        })
         .where(
-          and( 
+          and(
             eq(videos.id, metadata.videoId),
             eq(videos.userId, metadata.user.id)
           )

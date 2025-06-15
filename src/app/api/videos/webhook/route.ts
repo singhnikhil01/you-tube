@@ -1,6 +1,6 @@
 // import { Webhook } from "svix";
 import { eq } from "drizzle-orm";
-// import { WebhookEvent } from "@clerk/nextjs/server";
+import { UTApi } from "uploadthing/server";
 import { headers } from "next/headers";
 
 import {
@@ -61,6 +61,7 @@ export const POST = async (request: Request) => {
         .where(eq(videos.muxUploadId, data.upload_id));
       break;
     }
+
     case "video.asset.ready": {
       const data = payload.data as VideoAssetReadyWebhookEvent["data"];
 
@@ -73,24 +74,54 @@ export const POST = async (request: Request) => {
         return new Response("No playbackID found", { status: 400 });
       }
 
-      const thumbnailUrl = `https://image.mux.com/${playbackId}/thumbnail.jpg`;
-      const previewUrl = `https://image.mux.com/${playbackId}/animated.gif`;
+      const tempthumbnailUrl = `https://image.mux.com/${playbackId}/thumbnail.jpg`;
+      const temppreviewUrl = `https://image.mux.com/${playbackId}/animated.gif`;
       const duration = data.duration ? Math.round(data.duration * 1000) : 0;
 
-      await db
-        .update(videos)
-        .set({
-          muxStatus: data.status,
-          muxPlaybackId: playbackId,
-          muxAssetId: data.id,
-          thumbnailUrl: thumbnailUrl,
-          previewUrl: previewUrl,
-          duration: duration,
-        })
-        .where(eq(videos.muxAssetId, data.id));
+      const utapi = new UTApi();
+
+     
+
+    const [video] = await db
+      .select()
+      .from(videos)
+      .where(eq(videos.muxUploadId, data.upload_id));
+
+    let thumbnail, preview;
+
+    if (!video.previewKey && !video.thumbnailKey) {
+      const [uploadedThumbnail, uploadedPreview] =
+      await utapi.uploadFilesFromUrl([tempthumbnailUrl, temppreviewUrl]);
+      if (!uploadedThumbnail.data || !uploadedPreview.data) {
+        return new Response("Failed to upload thumbnail or preview", {
+          status: 500,
+        });
+      }
+      thumbnail = uploadedThumbnail.data;
+      preview = uploadedPreview.data;
+    }
+
+    await db
+      .update(videos)
+      .set({
+        muxStatus: data.status,
+        muxPlaybackId: playbackId,
+        muxAssetId: data.id,
+        ...(thumbnail && {
+          thumbnailUrl: thumbnail.ufsUrl,
+          thumbnailKey: thumbnail.key,
+        }),
+        ...(preview && {
+          previewKey: preview.key,
+          previewUrl: preview.ufsUrl,
+        }),
+        duration: duration,
+      })
+      .where(eq(videos.muxAssetId, data.id));
 
       break;
     }
+
     case "video.asset.errored": {
       const data = payload.data as VideoAssetErroredWebhookEvent["data"];
       if (!data.upload_id) {
@@ -125,6 +156,7 @@ export const POST = async (request: Request) => {
       //Typescript doesn't recognize asset_id in the type, so we add it manually
       const assetId = data.asset_id;
       const trackId = data.id;
+
       const status = data.status;
       if (!assetId) {
         return new Response("Missing asset ID", { status: 400 });

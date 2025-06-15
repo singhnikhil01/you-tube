@@ -37,7 +37,6 @@ export const studioRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       const { cursor, limit } = input;
       const userId = ctx.user.id;
-
       const baseCondition = eq(videos.userId, userId);
 
       const cursorCondition = cursor

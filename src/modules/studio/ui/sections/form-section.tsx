@@ -52,7 +52,7 @@ import { useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 import Image from "next/image";
 import { THUMBNAIL_FALLBACK } from "@/modules/videos/constants";
-import { ThumbnailUploadModal } from '../components/thumbnail-upload-modal';
+import { ThumbnailUploadModal } from "../components/thumbnail-upload-modal";
 
 interface FormSectionProps {
   videoId: string;
@@ -134,6 +134,7 @@ export const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
   const [video] = trpc.studio.getOne.useSuspenseQuery({ id: videoId });
   const [categories] = trpc.categories.getMany.useSuspenseQuery();
   const utils = trpc.useUtils();
+  
   const update = trpc.videos.update.useMutation({
     onSuccess: () => {
       utils.studio.getMany.invalidate();
@@ -150,6 +151,17 @@ export const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
       utils.studio.getMany.invalidate();
       toast.success("Video removed successfully");
       router.push("/studio");
+    },
+    onError: () => {
+      toast.error("something went wrong");
+    },
+  });
+
+  const restoreThumbnail = trpc.videos.restoreThumbnail.useMutation({
+    onSuccess: () => {
+      utils.studio.getMany.invalidate();
+      utils.studio.getOne.invalidate({ id: videoId });
+      toast.success("Thumbnail restored successfully");
     },
     onError: () => {
       toast.error("something went wrong");
@@ -190,7 +202,11 @@ export const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
 
   return (
     <>
-    <ThumbnailUploadModal open={thumbnailModelOpen} onOpenchange={setThumbnailModelOpen} videoId ={videoId}/>
+      <ThumbnailUploadModal
+        open={thumbnailModelOpen}
+        onOpenchange={setThumbnailModelOpen}
+        videoId={videoId}
+      />
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <div className="flex items-center justify-between mb-6">
@@ -298,7 +314,9 @@ export const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="start" side="right">
-                            <DropdownMenuItem onClick={() => setThumbnailModelOpen(true)}>
+                            <DropdownMenuItem
+                              onClick={() => setThumbnailModelOpen(true)}
+                            >
                               <ImagePlusIcon className="size-4 mr-1" />
                               Change
                             </DropdownMenuItem>
@@ -306,7 +324,11 @@ export const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
                               <SparklesIcon className="size-4 mr-1" />
                               AI Generated
                             </DropdownMenuItem>
-                            <DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => {
+                                restoreThumbnail.mutate({ id: video.id });
+                              }}
+                            >
                               <RotateCcw className="size-4 mr-1" />
                               Restore
                             </DropdownMenuItem>

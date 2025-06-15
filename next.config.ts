@@ -9,8 +9,9 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "image.mux.com",
+        hostname: "*.ufs.sh",
       },
+      
     ],
   },
 };
