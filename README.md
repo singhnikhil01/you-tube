@@ -66,6 +66,23 @@ To get a local copy up and running, follow these steps:
     ```
 4.  Set up environment variables. You will likely need configuration for Clerk, Neon Database, Ngrok (for webhooks), etc. Create a `.env.local` file in the root directory and add necessary variables (refer to `.env.example` if available, or relevant documentation for the used services).
 
+```bash
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
+CLERK_SECRET_KEY=
+NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
+NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
+NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL=/
+NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL=/
+CLERK_SIGNING_SECRET=
+DATABASE_URL=
+UPSTASH_REDIS_REST_URL=
+UPSTASH_REDIS_REST_TOKEN=
+MUX_TOKEN_SECRET=
+MUX_TOKEN_ID=
+MUX_WEBHOOK_SECRET=
+UPLOADTHING_TOKEN=
+```
+
 ## Usage
 
 To run the project locally:
