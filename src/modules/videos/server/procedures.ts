@@ -6,8 +6,28 @@ import { and, eq } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import z from "zod";
 import { UTApi } from "uploadthing/server";
+import { workflow } from "@/lib/qstash";
 
 export const VideosRouter = createTRPCRouter({
+  generateThumbnail: protectedProcedure
+    .input(z.object({ id: z.string().uuid() }))
+    .mutation(async ({ ctx , input}) => {
+     const {workflowRunId} = await workflow.trigger({
+        url: `${process.env.UPSTASH_WORKFLOW_URL}/api/videos/workflows/title`,
+        body: JSON.stringify({ userId: ctx.user.id , videoId: input.id }),
+        headers: {
+          "Content-Type": "application/json", 
+          "x-user-id": ctx.user.id,
+        },
+        // workflowRunId: `generate-title-${ctx.user.id}`,
+        retries: 3,
+      });
+      return workflowRunId;
+      
+      }),
+
+
+
   restoreThumbnail: protectedProcedure
     .input(z.object({ id: z.string().uuid() }))
     .mutation(async ({ ctx, input }) => {
