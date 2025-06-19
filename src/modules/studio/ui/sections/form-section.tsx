@@ -54,6 +54,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import Image from "next/image";
 import { THUMBNAIL_FALLBACK } from "@/modules/videos/constants";
 import { ThumbnailUploadModal } from "../components/thumbnail-upload-modal";
+import { ThumbnailGenerateModal } from "../components/thumbnail-generate-modal";
 
 interface FormSectionProps {
   videoId: string;
@@ -169,16 +170,7 @@ export const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
     },
   });
 
-  const generateThumbnail = trpc.videos.generateThumbnail.useMutation({
-    onSuccess: () => {
-      toast.success("Background job started", {
-        description: "You will be notified when the thumbnail is ready",
-      });
-    },
-    onError: () => {
-      toast.error("something went wrong");
-    },
-  });
+
 
   const generateTitle = trpc.videos.generateTitle.useMutation({
     onSuccess: () => {
@@ -233,14 +225,22 @@ export const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
   };
 
   const [thumbnailModelOpen, setThumbnailModelOpen] = useState(false);
+  const [thumbnailGenerateModalOpen, setThumbnailGenerateOpen] =
+    useState(false);
 
   return (
     <>
+     <ThumbnailGenerateModal
+        open={thumbnailGenerateModalOpen}
+        onOpenchange={setThumbnailGenerateOpen}
+        videoId={videoId}
+      />
       <ThumbnailUploadModal
         open={thumbnailModelOpen}
         onOpenchange={setThumbnailModelOpen}
         videoId={videoId}
       />
+     
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <div className="flex items-center justify-between mb-6">
@@ -392,7 +392,7 @@ export const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={() =>
-                                generateThumbnail.mutate({ id: video.id })
+                                setThumbnailGenerateOpen(true)
                               }
                             >
                               <SparklesIcon className="size-4 mr-1" />

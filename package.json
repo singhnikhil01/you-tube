@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@clerk/nextjs": "6.10.3",
+    "@google/genai": "^1.5.1",
     "@google/generative-ai": "^0.24.1",
     "@hookform/resolvers": "^5.0.1",
     "@mux/mux-node": "9.0.1",
