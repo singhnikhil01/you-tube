@@ -75,55 +75,60 @@ export const FormSectionSkeleton = () => {
     <div className="animate-pulse">
       <div className="flex items-center justify-between mb-6">
         <div className="">
-          <Skeleton className="h-8 bg-gray-200 rounded w-48 mb-2"></Skeleton>
-          <Skeleton className="h-4 bg-gray-200 rounded w-64"></Skeleton>
+          <Skeleton className="h-8 w-48 mb-2"></Skeleton>
+          <Skeleton className="h-4 w-64"></Skeleton>
         </div>
         <div className="flex items-center gap-x-2">
-          <Skeleton className="h-10 bg-gray-200 rounded w-16"></Skeleton>
-          <Skeleton className="h-10 w-10 bg-gray-200 rounded"></Skeleton>
+          <Skeleton className="h-10 w-16"></Skeleton>
+          <Skeleton className="h-10 w-10"></Skeleton>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
         <div className="space-y-8 lg:col-span-3">
           <div className="space-y-2">
-            <Skeleton className="h-4 bg-gray-200 rounded w-16"></Skeleton>
-            <Skeleton className="h-10 bg-gray-200 rounded w-full"></Skeleton>
+            <Skeleton className="h-4 w-16"></Skeleton>
+            <Skeleton className="h-10 w-full"></Skeleton>
           </div>
 
           <div className="space-y-2">
-            <Skeleton className="h-4 bg-gray-200 rounded w-24"></Skeleton>
-            <Skeleton className="h-40 bg-gray-200 rounded w-full"></Skeleton>
+            <Skeleton className="h-4 w-24"></Skeleton>
+            <Skeleton className="h-40 w-full"></Skeleton>
           </div>
 
           <div className="space-y-2">
-            <Skeleton className="h-4 bg-gray-200 rounded w-20"></Skeleton>
-            <Skeleton className="h-10 bg-gray-200 rounded w-full"></Skeleton>
+            <Skeleton className="h-4 w-20"></Skeleton>
+            <Skeleton className="h-[84px] w-[153px]"></Skeleton>
+          </div>
+
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-20"></Skeleton>
+            <Skeleton className="h-10 w-full"></Skeleton>
           </div>
         </div>
 
         <div className="flex flex-col gap-y-8 lg:col-span-2">
           <div className="flex flex-col gap-4 bg-[#F9F9F9] rounded-xl overflow-hidden h-fit">
-            <div className="aspect-video bg-gray-200"></div>
+            <Skeleton className="aspect-video w-full"></Skeleton>
             <div className="p-4 flex flex-col gap-y-6">
               <div className="space-y-2">
-                <Skeleton className="h-4 bg-gray-200 rounded w-20"></Skeleton>
-                <Skeleton className="h-4 bg-gray-200 rounded w-full"></Skeleton>
+                <Skeleton className="h-4 w-20"></Skeleton>
+                <Skeleton className="h-4 w-full"></Skeleton>
               </div>
               <div className="space-y-2">
-                <Skeleton className="h-3 bg-gray-200 rounded w-24"></Skeleton>
-                <Skeleton className="h-4 bg-gray-200 rounded w-20"></Skeleton>
+                <Skeleton className="h-3 w-24"></Skeleton>
+                <Skeleton className="h-4 w-20"></Skeleton>
               </div>
               <div className="space-y-2">
-                <Skeleton className="h-3 bg-gray-200 rounded w-24"></Skeleton>
-                <Skeleton className="h-4 bg-gray-200 rounded w-20"></Skeleton>
+                <Skeleton className="h-3 w-24"></Skeleton>
+                <Skeleton className="h-4 w-20"></Skeleton>
               </div>
             </div>
           </div>
 
           <div className="space-y-2">
-            <div className="h-4 bg-gray-200 rounded w-20"></div>
-            <div className="h-10 bg-gray-200 rounded w-full"></div>
+            <Skeleton className="h-4 w-20"></Skeleton>
+            <Skeleton className="h-10 w-full"></Skeleton>
           </div>
         </div>
       </div>

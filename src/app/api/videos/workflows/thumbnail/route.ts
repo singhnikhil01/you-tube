@@ -43,7 +43,7 @@ export const { POST } = serve(async (context) => {
 
       const response = await ai.models.generateContent({
         model: "gemini-2.0-flash-preview-image-generation",
-        contents: prompt,
+        contents: "\nGenerate a thumbnail for the video take care of the resolution and width and height make it proper video aspect ratio and based on the given prompt generate Image \n prompt: "+prompt,
         config: {
           responseModalities: [Modality.TEXT, Modality.IMAGE],
         },
