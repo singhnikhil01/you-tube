@@ -9,24 +9,53 @@ import { UTApi } from "uploadthing/server";
 import { workflow } from "@/lib/qstash";
 
 export const VideosRouter = createTRPCRouter({
-  generateThumbnail: protectedProcedure
+  generateTitle: protectedProcedure
     .input(z.object({ id: z.string().uuid() }))
-    .mutation(async ({ ctx , input}) => {
-     const {workflowRunId} = await workflow.trigger({
+    .mutation(async ({ ctx, input }) => {
+      const { workflowRunId } = await workflow.trigger({
         url: `${process.env.UPSTASH_WORKFLOW_URL}/api/videos/workflows/title`,
-        body: JSON.stringify({ userId: ctx.user.id , videoId: input.id }),
+        body: JSON.stringify({ userId: ctx.user.id, videoId: input.id }),
         headers: {
-          "Content-Type": "application/json", 
+          "Content-Type": "application/json",
           "x-user-id": ctx.user.id,
         },
         // workflowRunId: `generate-title-${ctx.user.id}`,
         retries: 3,
       });
       return workflowRunId;
-      
-      }),
+    }),
 
+  generateDescriptions: protectedProcedure
+    .input(z.object({ id: z.string().uuid() }))
+    .mutation(async ({ ctx, input }) => {
+      const { workflowRunId } = await workflow.trigger({
+        url: `${process.env.UPSTASH_WORKFLOW_URL}/api/videos/workflows/description`,
+        body: JSON.stringify({ userId: ctx.user.id, videoId: input.id }),
+        headers: {
+          "Content-Type": "application/json",
+          "x-user-id": ctx.user.id,
+        },
+        // workflowRunId: `generate-title-${ctx.user.id}`,
+        retries: 3,
+      });
+      return workflowRunId;
+    }),
 
+  generateThumbnail: protectedProcedure
+    .input(z.object({ id: z.string().uuid() }))
+    .mutation(async ({ ctx, input }) => {
+      const { workflowRunId } = await workflow.trigger({
+        url: `${process.env.UPSTASH_WORKFLOW_URL}/api/videos/workflows/title`,
+        body: JSON.stringify({ userId: ctx.user.id, videoId: input.id }),
+        headers: {
+          "Content-Type": "application/json",
+          "x-user-id": ctx.user.id,
+        },
+        // workflowRunId: `generate-title-${ctx.user.id}`,
+        retries: 3,
+      });
+      return workflowRunId;
+    }),
 
   restoreThumbnail: protectedProcedure
     .input(z.object({ id: z.string().uuid() }))
@@ -36,7 +65,7 @@ export const VideosRouter = createTRPCRouter({
         .select()
         .from(videos)
         .where(and(eq(videos.id, input.id), eq(videos.userId, userId)));
-        
+
       if (!existingVideo) {
         throw new TRPCError({
           code: "NOT_FOUND",

@@ -5,7 +5,11 @@ export const TITLE_SYSTEM_PROMPT = `Your task is to generate an SEO-focused titl
 - Avoid jargon or overly complex language unless it directly supports searchability.
 - Use action-oriented phrasing or clear value propositions where applicable.
 - Ensure the title is 3-8 words long and no more than 100 characters.
-- ONLY return the title as plain text. Do not add quotes or any additional formatting.`;
+- ONLY return the title as plain text. Do not add quotes or any additional formatting.
+Trascript: 
+`;
+
+
 
 export const DESCRIPTION_SYSTEM_PROMPT = `Your task is to summarize the transcript of a video. Please follow these guidelines:
 

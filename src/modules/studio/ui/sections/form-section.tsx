@@ -37,6 +37,7 @@ import {
   CopyIcon,
   Globe2Icon,
   ImagePlusIcon,
+  Loader2Icon,
   LockIcon,
   MoreVerticalIcon,
   RotateCcw,
@@ -179,6 +180,28 @@ export const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
     },
   });
 
+  const generateTitle = trpc.videos.generateTitle.useMutation({
+    onSuccess: () => {
+      toast.success("Background job started", {
+        description: "You will be notified when the thumbnail is ready",
+      });
+    },
+    onError: () => {
+      toast.error("something went wrong");
+    },
+  });
+
+  const generateDescription = trpc.videos.generateDescriptions.useMutation({
+    onSuccess: () => {
+      toast.success("Background job started", {
+        description: "You will be notified when the thumbnail is ready",
+      });
+    },
+    onError: () => {
+      toast.error("something went wrong");
+    },
+  });
+
   const form = useForm<z.infer<typeof VideoUpdateSchema>>({
     resolver: zodResolver(VideoUpdateSchema),
     defaultValues: video,
@@ -258,8 +281,25 @@ export const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
-                      Title
-                      {/* TODO: ADD AI generated button */}
+                      <div className="flex items-center gap-x-2">
+                        Title
+                        <Button
+                          size={"icon"}
+                          variant="outline"
+                          type="button"
+                          className="rounded-full size-6 [&_svg]:size-3"
+                          onClick={() => generateTitle.mutate({ id: video.id })}
+                          disabled={
+                            generateTitle.isPending || !video.muxTrackId
+                          }
+                        >
+                          {generateTitle.isPending ? (
+                            <Loader2Icon className="animate-spin" />
+                          ) : (
+                            <SparklesIcon />
+                          )}
+                        </Button>
+                      </div>
                     </FormLabel>
                     <FormControl>
                       <Input
@@ -278,8 +318,27 @@ export const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
-                      Description
-                      {/* TODO: ADD AI generated button */}
+                      <div className="flex items-center gap-x-2">
+                        Description
+                        <Button
+                          size={"icon"}
+                          variant="outline"
+                          type="button"
+                          className="rounded-full size-6 [&_svg]:size-3"
+                          onClick={() =>
+                            generateDescription.mutate({ id: video.id })
+                          }
+                          disabled={
+                            generateDescription.isPending || !video.muxTrackId
+                          }
+                        >
+                          {generateDescription.isPending ? (
+                            <Loader2Icon className="animate-spin" />
+                          ) : (
+                            <SparklesIcon />
+                          )}
+                        </Button>
+                      </div>
                     </FormLabel>
                     <FormControl>
                       <Textarea
@@ -332,8 +391,10 @@ export const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
                               Change
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                            
-                            onClick={() => generateThumbnail.mutate({ id: video.id })}>
+                              onClick={() =>
+                                generateThumbnail.mutate({ id: video.id })
+                              }
+                            >
                               <SparklesIcon className="size-4 mr-1" />
                               AI Generated
                             </DropdownMenuItem>
