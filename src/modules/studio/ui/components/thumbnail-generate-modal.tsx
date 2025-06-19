@@ -88,7 +88,9 @@ export const ThumbnailGenerateModal = ({
             )}
           />
           <div className="flex justify-end">
-            <Button type="submit">Generate</Button>
+            <Button type="submit" disabled={generateThumbnail.isPending}>
+              Generate
+            </Button>
           </div>
         </form>
       </Form>
