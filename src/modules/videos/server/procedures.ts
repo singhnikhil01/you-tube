@@ -1,14 +1,47 @@
 import { db } from "@/db";
-import { videos, VideoUpdateSchema } from "@/db/schema";
+import { users, videos, VideoUpdateSchema } from "@/db/schema";
 import { mux } from "@/lib/mux";
-import { protectedProcedure, createTRPCRouter } from "@/trpc/init";
-import { and, eq } from "drizzle-orm";
+import {
+  protectedProcedure,
+  createTRPCRouter,
+  baseProcedure,
+} from "@/trpc/init";
+import { and, eq, getTableColumns } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import z from "zod";
 import { UTApi } from "uploadthing/server";
 import { workflow } from "@/lib/qstash";
+// import { videoVisiblity } from "@/db/schema";
 
 export const VideosRouter = createTRPCRouter({
+  getOne: baseProcedure
+    .input(z.object({ id: z.string().uuid() }))
+    .query(async ({ input }) => {
+      // const { id: userId } = ctx.user;
+      const [existingvideo] = await db
+        .select({
+          ...getTableColumns(videos),
+          user: {
+            ...getTableColumns(users),
+          },
+        })
+        .from(videos)
+        .innerJoin(users, eq(videos.userId, users.id))
+        .where(
+          and(
+            eq(videos.id, input.id),
+            // eq(videos.visibility, videoVisiblity.enumValues[1])
+          )
+        );
+
+      if (!existingvideo) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Video not found",
+        });
+      }
+      return existingvideo;
+    }),
   generateTitle: protectedProcedure
     .input(z.object({ id: z.string().uuid() }))
     .mutation(async ({ ctx, input }) => {
@@ -42,11 +75,20 @@ export const VideosRouter = createTRPCRouter({
     }),
 
   generateThumbnail: protectedProcedure
-    .input(z.object({ id: z.string().uuid() , prompt: z.string().min(10, "Prompt is required")}))
+    .input(
+      z.object({
+        id: z.string().uuid(),
+        prompt: z.string().min(10, "Prompt is required"),
+      })
+    )
     .mutation(async ({ ctx, input }) => {
       const { workflowRunId } = await workflow.trigger({
         url: `${process.env.UPSTASH_WORKFLOW_URL}/api/videos/workflows/thumbnail`,
-        body: JSON.stringify({ userId: ctx.user.id, videoId: input.id , prompt: input.prompt}),
+        body: JSON.stringify({
+          userId: ctx.user.id,
+          videoId: input.id,
+          prompt: input.prompt,
+        }),
         headers: {
           "Content-Type": "application/json",
           "x-user-id": ctx.user.id,
