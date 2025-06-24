@@ -27,6 +27,10 @@ export const VideoReactions = ({
   const utils = trpc.useUtils();
 
   const like = trpc.videoReactions.like.useMutation({
+    onSuccess: () => {
+      utils.videos.getOne.invalidate({ id: videoId });
+      //TODO: Invalidate "liked" playlist
+    },
     onError: (error) => {
       if (error.data?.code === "UNAUTHORIZED") {
         toast.error("You need to be signed in to like or dislike a video.");
