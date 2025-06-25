@@ -7,6 +7,7 @@ import {
 import { comments, users } from "@/db/schema";
 import { eq, desc, getTableColumns, or, lt, and, count } from "drizzle-orm";
 import z from "zod";
+import { TRPCError } from "@trpc/server";
 
 export const commentsRouter = createTRPCRouter({
   create: protectedProcedure
@@ -29,6 +30,31 @@ export const commentsRouter = createTRPCRouter({
         })
         .returning();
       return createdComment;
+    }),
+
+  remove: protectedProcedure
+    .input(
+      z.object({
+        id: z.string().uuid(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { id: userId } = ctx.user;
+      const { id } = input;
+
+      const [deletedComment] = await db
+        .delete(comments)
+        .where(and(eq(comments.id, id), eq(comments.userId, userId)))
+        .returning();
+
+      if (!deletedComment) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message:
+            "Comment not found or you do not have permission to delete it",
+        });
+      }
+      return deletedComment;
     }),
 
   getMany: baseProcedure
