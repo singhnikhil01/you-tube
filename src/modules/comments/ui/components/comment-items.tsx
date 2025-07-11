@@ -68,7 +68,7 @@ const CommentItems = ({ comment }: CommentItemsProps) => {
           <p className="text-sm">{comment.value}</p>
           {/* TODO: reactions */}
         </div>
-        <DropdownMenu>
+        <DropdownMenu modal={false}>
           <DropdownMenuTrigger asChild>
             <Button variant={"ghost"} size={"icon"} className="size-8">
               <MoreVerticalIcon />

@@ -20,7 +20,6 @@ export const commentsRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const { id: userId } = ctx.user;
       const { videoId, value } = input;
-
       const [createdComment] = await db
         .insert(comments)
         .values({

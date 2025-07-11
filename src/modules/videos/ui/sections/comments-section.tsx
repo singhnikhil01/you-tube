@@ -2,7 +2,7 @@
 import { InfiniteScroll } from "@/components/infinite-scroll";
 import { DEFAULT_LIMIT } from "@/constants";
 import { CommentForm } from "@/modules/comments/ui/components/comment-form";
-import CommentItems from "@/modules/comments/ui/components/comment-tems";
+import CommentItems from "@/modules/comments/ui/components/comment-items";
 import { trpc } from "@/trpc/client";
 import { Loader2Icon } from "lucide-react";
 import React, { Suspense } from "react";
