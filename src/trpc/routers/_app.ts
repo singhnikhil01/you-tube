@@ -17,7 +17,7 @@ export const appRouter = createTRPCRouter({
   videoReactions: videoReactionsRouter,
   subscriptions: subscriptionRouter,
   comments: commentsRouter, 
-  suggestionsRouter: suggestionsRouter,
+  suggestions: suggestionsRouter,
   commentReactions: commentReactionsRouter
 });
 export type AppRouter = typeof appRouter;
