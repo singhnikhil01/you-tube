@@ -25,6 +25,7 @@ export const searchRouter = createTRPCRouter({
       const filters = [];
 
       // Search filter
+      console.log(query)
       if (query) {
         filters.push(ilike(videos.title, `%${query}%`));
       }

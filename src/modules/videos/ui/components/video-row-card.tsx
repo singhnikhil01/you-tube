@@ -31,7 +31,7 @@ const videoRowCardVariants = cva("group flex min-w-0", {
 const thumbnailVariants = cva("relative flex-none", {
   variants: {
     size: {
-      default: "w-[38%]",
+      default: "w-[30%]",
       compact: "w-[168px]",
     },
   },
@@ -45,7 +45,7 @@ interface VideoRowCardProps extends VariantProps<typeof videoRowCardVariants> {
   onRemove?: () => void;
 }
 
-export const VideoRowCardSkleton = ({ size }:  VariantProps<typeof videoRowCardVariants>) => {
+export const VideoRowCardSkleton = ({ size="default" }:  VariantProps<typeof videoRowCardVariants>) => {
   return (
     <div className={videoRowCardVariants({ size })}>
       <div className={thumbnailVariants({ size })}>

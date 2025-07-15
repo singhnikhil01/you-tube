@@ -20,30 +20,28 @@ interface ResultSectionProps {
   categoryId?: string | undefined;
 }
 const ResultSectionSkleton = () => {
-  const isMobile = useIsMobile();
+
 
   return (
     <>
-      {isMobile ? (
-        <div className="flex flex-col gap-4 gap-y-10">
-          {Array.from({ length: 6 }).map((_, index) => (
-            <VideoGridCardSkeleton key={index} />
-          ))}
-        </div>
-      ) : (
-        <div className="flex flex-col gap-4">
-          {Array.from({ length: 6 }).map((_, index) => (
-            <VideoRowCardSkleton key={index} />
-          ))}
-        </div>
-      )}
+      <div className=" hidden  flex-col gap-4 md:flex">
+        {Array.from({ length: 6 }).map((_, index) => (
+          <VideoRowCardSkleton key={index} />
+        ))}
+      </div>
+
+      <div className="flex flex-col gap-4 p-4 gap-y-10 pt-6 md:hidden"> 
+        {Array.from({ length: 6 }).map((_, index) => (
+          <VideoGridCardSkeleton key={index} />
+        ))}
+      </div>
     </>
   );
 };
 
 export const ResultSection = ({ query, categoryId }: ResultSectionProps) => {
   return (
-    <Suspense fallback={<ResultSectionSkleton />}>
+    <Suspense key={`${query}-${categoryId}`} fallback={<ResultSectionSkleton />}>
       <ErrorBoundary fallback={<p>Error...</p>}>
         <ResultSectionSuspense query={query} categoryId={categoryId} />
       </ErrorBoundary>

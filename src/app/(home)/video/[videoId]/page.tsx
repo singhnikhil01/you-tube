@@ -3,6 +3,8 @@ import { VideoView } from "@/modules/videos/ui/views/video-view";
 import { HydrateClient, trpc } from "@/trpc/server";
 import React from "react";
 
+export const dynamic = "force-dynamic";
+
 interface PageProps {
   params: Promise<{ videoId: string }>;
 }
@@ -19,7 +21,7 @@ const page = async ({ params }: PageProps) => {
     videoId,
     limit: DEFAULT_LIMIT,
   });
-  
+
   return (
     <HydrateClient>
       <VideoView videoId={videoId} />
