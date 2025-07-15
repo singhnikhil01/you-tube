@@ -82,7 +82,7 @@ export const VideoRowCardSkleton = ({ size }:  VariantProps<typeof videoRowCardV
   );
 };
 
-export const VideoRowCard = ({ data, size, onRemove }: VideoRowCardProps) => {
+export const VideoRowCard = ({ data, size="default", onRemove }: VideoRowCardProps) => {
   const compactViews = useMemo(() => {
     return Intl.NumberFormat("en", {
       notation: "compact",
@@ -97,7 +97,7 @@ export const VideoRowCard = ({ data, size, onRemove }: VideoRowCardProps) => {
 
   return (
     <div className={videoRowCardVariants({ size })}>
-      <Link href={`/videos/${data.id}`} className={thumbnailVariants({ size })}>
+      <Link href={`/video/${data.id}`} className={thumbnailVariants({ size })}>
         <VideoThumbnail
           title={data.title}
           duration={data.duration}
@@ -109,7 +109,7 @@ export const VideoRowCard = ({ data, size, onRemove }: VideoRowCardProps) => {
       {/* info */}
       <div className="flex-1 min-1-0">
         <div className="flex justify-between gap-x-2">
-          <Link href={`/videos/${data.id}`} className="flex-1 min-1-0">
+          <Link href={`/video/${data.id}`} className="flex-1 min-1-0">
             <h3
               className={cn(
                 "font-medium line-clamp-2",
