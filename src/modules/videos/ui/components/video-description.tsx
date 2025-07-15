@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { cn } from "@/lib/utils";
 import { ChevronsDownIcon, ChevronUpIcon } from "lucide-react";
 import React from "react";
+import ReactMarkdown from "react-markdown";
 
 interface VideoDescriptionProps {
   compactViews: string;
@@ -32,26 +34,46 @@ export const VideoDescription = ({
         </span>
       </div>
       <div className="relative">
-        <p
-          className={cn(
-            "texts-sm whitespace-pre-wrap",
-            !isExpanded && "line-clamp-2"
-          )}
+        <ReactMarkdown
+          components={{
+            a: ({ node, ...props }) => (
+              <a
+                {...props}
+                className="text-blue-600 underline"
+                target="_blank"
+                rel="noopener noreferrer"
+              />
+            ),
+            h1: ({ node, ...props }) => (
+              <h1 {...props} className="text-blue-600 text-lg font-semibold" />
+            ),
+            h2: ({ node, ...props }) => (
+              <h2 {...props} className="text-blue-600 text-md font-semibold" />
+            ),
+            p: ({ node, ...props }) => (
+              <p
+                {...props}
+                className={cn(
+                  "texts-sm whitespace-pre-wrap",
+                  !isExpanded && "line-clamp-2"
+                )}
+              />
+            ),
+          }}
         >
           {description || "No description available."}
-        </p>
+        </ReactMarkdown>
+
         <div className="flex items-center gap-1 mt-4 text-sm font-medium">
-            {
-                isExpanded ? (
-                    <>
-                    Show less <ChevronUpIcon className="size-4" />
-                    </>
-                ):(
-                    <>
-                     Show less <ChevronsDownIcon className="size-4" />
-                    </>
-                )
-            }
+          {isExpanded ? (
+            <>
+              Show less <ChevronUpIcon className="size-4" />
+            </>
+          ) : (
+            <>
+              Show less <ChevronsDownIcon className="size-4" />
+            </>
+          )}
         </div>
       </div>
     </div>

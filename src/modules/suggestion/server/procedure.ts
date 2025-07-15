@@ -2,7 +2,7 @@ import { db } from "@/db";
 import { users, videoReactions, videos, videoViews } from "@/db/schema";
 import { createTRPCRouter, baseProcedure } from "@/trpc/init";
 import { z } from "zod";
-import { eq, and, or, lt, desc, getTableColumns } from "drizzle-orm";
+import { eq, and, or, lt, desc, getTableColumns, not } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 
 export const suggestionsRouter = createTRPCRouter({
@@ -42,7 +42,8 @@ export const suggestionsRouter = createTRPCRouter({
       if (existingVideo.categoryId) {
         whereConditions.push(eq(videos.categoryId, existingVideo.categoryId));
       }
-
+      whereConditions.push(not(eq(videos.id, videoId)));
+      whereConditions.push(eq(videos.visibility, "public"));
       // Cursor pagination
       if (cursor) {
         const paginationCondition = or(

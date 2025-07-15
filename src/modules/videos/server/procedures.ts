@@ -159,6 +159,73 @@ export const VideosRouter = createTRPCRouter({
       return workflowRunId;
     }),
 
+  revalidate: protectedProcedure
+    .input(z.object({ id: z.string().uuid() }))
+    .mutation(async ({ ctx, input }) => {
+      const { id: userId } = ctx.user;
+      const [existingVideo] = await db
+        .select()
+        .from(videos)
+        .where(and(eq(videos.id, input.id), eq(videos.userId, userId)));
+
+      if (!existingVideo) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message:
+            "Video not found or you do not have permission to restore it",
+        });
+      }
+
+      if (!existingVideo.muxUploadId) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message:
+            "Video does not have a Mux playback ID, cannot restore thumbnail",
+        });
+      }
+
+      const directUpload = await mux.video.uploads.retrieve(
+        existingVideo.muxUploadId
+      );
+
+      if (!directUpload || !directUpload.asset_id) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Mux upload not found",
+        });
+      }
+
+      const asset = await mux.video.assets.retrieve(directUpload.asset_id);
+
+      if (!asset) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Mux asset not found",
+        });
+      }
+      if (asset.status !== "ready") {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Mux asset is not ready",
+        });
+      }
+      const playbackId = asset.playback_ids?.[0].id;
+      const duration = asset.duration ? Math.round(asset.duration * 1000) : 0;
+      // TODO: check the track status and also set the track if possible
+      const [updatedVideo] = await db
+        .update(videos)
+        .set({
+          muxPlaybackId: playbackId,
+          muxStatus: asset.status,
+          muxAssetId: asset.id,
+          duration: duration,
+          updatedAt: new Date(),
+        })
+        .where(and(eq(videos.id, input.id), eq(videos.userId, userId)))
+        .returning();
+      return updatedVideo;
+    }),
+
   restoreThumbnail: protectedProcedure
     .input(z.object({ id: z.string().uuid() }))
     .mutation(async ({ ctx, input }) => {

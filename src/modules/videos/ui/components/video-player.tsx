@@ -3,6 +3,7 @@ import React from "react";
 
 import Muxplayer from "@mux/mux-player-react";
 import { THUMBNAIL_FALLBACK } from "../../constants";
+import Image from "next/image";
 
 interface VideoPlayerProps {
   playbackId?: string | null | undefined;
@@ -20,7 +21,18 @@ export const VideoPlayer = ({
   autoPlay,
 }: VideoPlayerProps) => {
   if (!playbackId) {
-    return <div className="text-red-500">Playback ID is required</div>;
+    return (
+      <div className="text-red-500">
+        Playback ID is Not Avaliable
+        <Image
+          src={THUMBNAIL_FALLBACK}
+          alt="Thumbnail fallback"
+          width={640}
+          height={360}
+          className="w-full h-full object-cover"
+        />
+      </div>
+    );
   }
   return (
     <Muxplayer

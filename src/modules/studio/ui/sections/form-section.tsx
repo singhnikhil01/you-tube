@@ -41,6 +41,7 @@ import {
   LockIcon,
   MoreVerticalIcon,
   RotateCcw,
+  RotateCcwIcon,
   SparklesIcon,
   TrashIcon,
 } from "lucide-react";
@@ -164,6 +165,17 @@ export const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
     },
   });
 
+  const revalidate = trpc.videos.revalidate.useMutation({
+    onSuccess: () => {
+      utils.studio.getMany.invalidate();
+      utils.studio.getOne.invalidate({ id: videoId });
+      toast.success("Video revalidated successfully");
+    },
+    onError: () => {
+      toast.error("something went wrong");
+    },
+  });
+
   const restoreThumbnail = trpc.videos.restoreThumbnail.useMutation({
     onSuccess: () => {
       utils.studio.getMany.invalidate();
@@ -268,10 +280,17 @@ export const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                    onClick={() => revalidate.mutate({ id: video.id })}
+                  >
+                    <RotateCcwIcon className="size-4  mr-2" />
+                     Revalidate
+                  </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => remove.mutate({ id: video.id })}
                   >
-                    <TrashIcon className="size-4  mr-2" /> Delete
+                    <TrashIcon className="size-4  mr-2" />
+                     Delete
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
