@@ -28,9 +28,7 @@ export const VideoMenu = ({
   onRemove,
 }: VideoMenuProps) => {
   const onShare = () => {
-    const fullUrl = `${
-     APP_URL || "http://localhost:3000"
-    }/video/${videoId}`;
+    const fullUrl = `${APP_URL}/video/${videoId}`;
     navigator.clipboard.writeText(fullUrl);
     toast.success("Video link copied to clipboard!");
   };

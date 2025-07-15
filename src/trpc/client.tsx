@@ -23,8 +23,7 @@ function getQueryClient() {
 function getUrl() {
   const base = (() => {
     if (typeof window !== "undefined") return "";
-    if (APP_URL) return `https://${APP_URL}`;
-    return "http://localhost:3000";
+    return APP_URL;
   })();
   return `${base}/api/trpc`;
 }
@@ -40,11 +39,11 @@ export function TRPCProvider(
         httpBatchLink({
           transformer: superjson,
           url: getUrl(),
-          async headers(){
+          async headers() {
             const headers = new Headers();
-            headers.set("x-trpc-source","nextjs-react")
+            headers.set("x-trpc-source", "nextjs-react");
             return headers;
-          }
+          },
         }),
       ],
     })
