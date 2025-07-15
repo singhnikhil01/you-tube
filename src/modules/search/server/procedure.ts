@@ -25,7 +25,7 @@ export const searchRouter = createTRPCRouter({
       const filters = [];
 
       // Search filter
-      console.log(query)
+
       if (query) {
         filters.push(ilike(videos.title, `%${query}%`));
       }
@@ -47,6 +47,8 @@ export const searchRouter = createTRPCRouter({
           )
         );
       }
+
+      filters.push(eq(videos.visibility, "public"));
 
       const data = await db
         .select({
