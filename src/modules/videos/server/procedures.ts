@@ -30,6 +30,86 @@ import { workflow } from "@/lib/qstash";
 // import { videoVisiblity } from "@/db/schema";
 
 export const VideosRouter = createTRPCRouter({
+  getManyTrending: baseProcedure
+    .input(
+      z.object({
+        cursor: z
+          .object({
+            id: z.string().uuid(),
+            viewCount: z.number(),
+          })
+          .optional(), // no need for nullable() if optional()
+        limit: z.number().min(1).max(100),
+      })
+    )
+    .query(async ({ input }) => {
+      const { cursor, limit } = input;
+      const filters = [];
+
+
+      const viewCountSubquery = db.$count(
+        videoViews,
+        eq(videoViews.videoId, videos.id)
+      )
+
+      // Cursor pagination logic
+      if (cursor) {
+        filters.push(
+          or(
+            lt(viewCountSubquery, new Date(cursor.viewCount)),
+            and(
+              eq(viewCountSubquery, new Date(cursor.viewCount)),
+              lt(videos.id, cursor.id)
+            )
+          )
+        );
+      }
+      filters.push(eq(videos.visibility, "public"));
+      const data = await db
+        .select({
+          ...getTableColumns(videos),
+          user: users,
+          viewCount: viewCountSubquery,
+          likeCount: db.$count(
+            videoReactions,
+            and(
+              eq(videoReactions.videoId, videos.id),
+              eq(videoReactions.type, "like")
+            )
+          ),
+          dislikeCount: db.$count(
+            videoReactions,
+            and(
+              eq(videoReactions.videoId, videos.id),
+              eq(videoReactions.type, "dislike")
+            )
+          ),
+        })
+        .from(videos)
+        .innerJoin(users, eq(videos.userId, users.id))
+        .where(filters.length > 0 ? and(...filters) : undefined)
+        .orderBy(desc(viewCountSubquery), desc(videos.id))
+        .limit(limit + 1);
+
+      const hasMore = data.length > limit;
+      const items = hasMore ? data.slice(0, -1) : data;
+
+      const lastItem = items.at(-1);
+
+      const nextCursor =
+        hasMore && lastItem
+          ? {
+              id: lastItem.id,
+              viewCount: lastItem.viewCount,
+            }
+          : null;
+
+      return {
+        items,
+        nextCursor,
+      };
+    }),
+
   getMany: baseProcedure
     .input(
       z.object({
