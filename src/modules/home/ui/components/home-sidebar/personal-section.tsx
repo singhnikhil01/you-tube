@@ -20,7 +20,7 @@ const items = [
   },
   {
     title: "Liked Videos",
-    url: "/playlists/liked",
+    url: "/playlist/liked",
     icon:ThumbsUpIcon,
     auth: true,
   },
