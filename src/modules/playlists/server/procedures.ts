@@ -89,7 +89,7 @@ export const PlaylistsRouter = createTRPCRouter({
         hasMore && lastItem
           ? {
               id: lastItem.id,
-              updatedAt: lastItem.updatedAt.toISOString(),
+              viewedAt: lastItem.updatedAt.toISOString(),
             }
           : null;
 

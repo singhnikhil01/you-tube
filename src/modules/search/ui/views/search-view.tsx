@@ -1,5 +1,5 @@
 import CategoriesSection from "../sections/categories-section";
-import { ResultSection } from "./result-section";
+import { ResultSection } from "../sections/result-section";
 interface SearchProps {
   query: string | undefined;
   categoryId?: string | undefined;
