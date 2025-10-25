@@ -2,7 +2,6 @@
 
 import { DEFAULT_LIMIT } from "@/constants";
 import { trpc } from "@/trpc/client";
-import { useIsMobile } from "@/hooks/use-mobile";
 import {
   VideoRowCard,
   VideoRowCardSkleton,
@@ -64,7 +63,7 @@ export const ResultSectionSuspense = ({
     }
   );
 
-  const isMobile = useIsMobile();
+ 
 
   return (
     <>
