@@ -13,8 +13,7 @@ type ToasterToast = ToastProps & {
   action?: ToastActionElement
 }
 
-// ✅ Use type only, remove ESLint error
-type ActionType = "ADD_TOAST" | "UPDATE_TOAST" | "DISMISS_TOAST" | "REMOVE_TOAST"
+
 
 type Action =
   | { type: "ADD_TOAST"; toast: ToasterToast }
