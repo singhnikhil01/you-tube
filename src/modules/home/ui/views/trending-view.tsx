@@ -1,6 +1,4 @@
 import React from "react";
-import CategoriesSection from "../sections/category-section";
-import { HomeVideosSection } from "../sections/home-videos-section";
 import { TrendingVideosSection } from "../sections/trending-videos-section";
 
 const TrendingView = () => {

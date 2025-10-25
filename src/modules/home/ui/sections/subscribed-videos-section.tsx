@@ -9,17 +9,17 @@ import { trpc } from "@/trpc/client";
 import { Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 
-export const TrendingVideosSection = () => {
+export const SubscribedVideosSection = () => {
   return (
-    <Suspense fallback={<TrendingVideoSectionSkleton />}>
+    <Suspense fallback={<SubscribedVideoSectionSkleton />}>
       <ErrorBoundary fallback={<p>Error loading videos...</p>}>
-        <TrendingVideosSectionSuspense />
+        <SubscribedVideosSectionSuspense />
       </ErrorBoundary>
     </Suspense>
   );
 };
 
-export const TrendingVideoSectionSkleton = () => {
+export const SubscribedVideoSectionSkleton = () => {
   return (
     <div>
       <div
@@ -35,8 +35,8 @@ export const TrendingVideoSectionSkleton = () => {
   );
 };
 
-export const TrendingVideosSectionSuspense = () => {
-  const [videos, query] = trpc.videos.getManyTrending.useSuspenseInfiniteQuery(
+export const SubscribedVideosSectionSuspense = () => {
+  const [videos, query] = trpc.videos.getManySubscribed.useSuspenseInfiniteQuery(
     {
       limit: DEFAULT_LIMIT,
     },

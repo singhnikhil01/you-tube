@@ -27,9 +27,105 @@ import { TRPCError } from "@trpc/server";
 import z from "zod";
 import { UTApi } from "uploadthing/server";
 import { workflow } from "@/lib/qstash";
+import { subBusinessDays } from "date-fns";
 // import { videoVisiblity } from "@/db/schema";
 
 export const VideosRouter = createTRPCRouter({
+  getManySubscribed: protectedProcedure
+    .input(
+      z.object({
+        cursor: z
+          .object({
+            id: z.string().uuid(),
+            updatedAt: z.date(),
+          })
+          .optional(),
+        limit: z.number().min(1).max(100),
+      })
+    )
+    .query(async ({ input, ctx }) => {
+      const { id: userId } = ctx.user;
+      const { cursor, limit } = input;
+
+      // Get the IDs of the creators the user is subscribed to
+      const viewerSubscriptions = await db
+        .select({
+          creatorId: subscriptions.creatorId,
+        })
+        .from(subscriptions)
+        .where(eq(subscriptions.viewerId, userId));
+
+      const filters = [];
+
+      // Only videos from subscribed creators
+      filters.push(
+        inArray(
+          videos.userId,
+          viewerSubscriptions.map((v) => v.creatorId)
+        )
+      );
+
+      // Only public videos
+      filters.push(eq(videos.visibility, "public"));
+
+      // Cursor pagination
+      if (cursor) {
+        filters.push(
+          or(
+            lt(videos.updatedAt, cursor.updatedAt),
+            and(
+              eq(videos.updatedAt, cursor.updatedAt),
+              lt(videos.id, cursor.id)
+            )
+          )
+        );
+      }
+
+      // Fetch videos with user info, viewCount, likeCount, dislikeCount
+      const data = await db
+        .select({
+          ...getTableColumns(videos),
+          user: users,
+          viewCount: db.$count(videoViews, eq(videoViews.videoId, videos.id)),
+          likeCount: db.$count(
+            videoReactions,
+            and(
+              eq(videoReactions.videoId, videos.id),
+              eq(videoReactions.type, "like")
+            )
+          ),
+          dislikeCount: db.$count(
+            videoReactions,
+            and(
+              eq(videoReactions.videoId, videos.id),
+              eq(videoReactions.type, "dislike")
+            )
+          ),
+        })
+        .from(videos)
+        .innerJoin(users, eq(videos.userId, users.id))
+        .where(filters.length > 0 ? and(...filters) : undefined)
+        .orderBy(desc(videos.updatedAt), desc(videos.id))
+        .limit(limit + 1);
+
+      const hasMore = data.length > limit;
+      const items = hasMore ? data.slice(0, -1) : data;
+      const lastItem = items.at(-1);
+
+      const nextCursor =
+        hasMore && lastItem
+          ? {
+              id: lastItem.id,
+              updatedAt: lastItem.updatedAt,
+            }
+          : null;
+
+      return {
+        items,
+        nextCursor,
+      };
+    }),
+
   getManyTrending: baseProcedure
     .input(
       z.object({
@@ -46,11 +142,10 @@ export const VideosRouter = createTRPCRouter({
       const { cursor, limit } = input;
       const filters = [];
 
-
       const viewCountSubquery = db.$count(
         videoViews,
         eq(videoViews.videoId, videos.id)
-      )
+      );
 
       // Cursor pagination logic
       if (cursor) {
