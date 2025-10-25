@@ -85,7 +85,7 @@ const CommentItems = ({ comment, variant = "comment" }: CommentItemsProps) => {
         <Link href={`/users/${comment.userId}`}>
           <UserAvatar
             size={variant === "comment" ? "lg" : "sm"}
-            imageUrl={comment.user.imageUrl || "./user_placeholder.svg"}
+            imageUrl={comment.user.imageUrl}
             className={"cursor-pointer"}
             name={comment.user.name || "User"}
           />

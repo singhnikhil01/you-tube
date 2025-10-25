@@ -80,7 +80,7 @@ export const CommentForm = ({
       >
         <UserAvatar
           size={"lg"}
-          imageUrl={user?.imageUrl || "./user_placeholder.svg"}
+          imageUrl={user?.imageUrl }
           name={user?.username || "User"}
         />
         <div className="flex-1">
