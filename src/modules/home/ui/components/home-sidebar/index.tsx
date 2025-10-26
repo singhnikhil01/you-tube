@@ -6,6 +6,8 @@ import { PersonalSection } from "./personal-section";
 import Image from "next/image";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import Link from "next/link";
+import { SignedIn } from "@clerk/nextjs";
+import { SubscriptionsSection } from "./subscriptions-section";
 
 export const HomeSidebar = () => {
   return (
@@ -23,6 +25,11 @@ export const HomeSidebar = () => {
         <MainSection />
         <Separator/>
         <PersonalSection />
+        <SignedIn>
+
+           <Separator />
+           <SubscriptionsSection />
+        </SignedIn>
       </SidebarContent>
     </Sidebar>
   );

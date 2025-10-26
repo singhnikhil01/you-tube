@@ -7,20 +7,21 @@ export const dynamic = "force-dynamic";
 
 interface PageProps {
   params: Promise<{
-    userId: string;
+    userid: string;
   }>;
 }
 
 const Page = async ({ params }: PageProps) => {
-  const { userId } = await params;
-  void trpc.users.getOne.prefetch({ id: userId });
+  const { userid } = await params;
+
+  void trpc.users.getOne.prefetch({ id: userid });
   void trpc.videos.getMany.prefetchInfinite({
-    userId: userId,
+    userId: userid,
     limit: DEFAULT_LIMIT,
   });
   return (
     <HydrateClient>
-      <UserView userId={userId} />
+      <UserView userId={userid} />
     </HydrateClient>
   );
 };
