@@ -3,9 +3,12 @@ import { InfiniteScroll } from "@/components/infinite-scroll";
 import { DEFAULT_LIMIT } from "@/constants";
 import {
   VideoGridCard,
-  VideoGridCardSkeleton
+  VideoGridCardSkeleton,
 } from "@/modules/videos/ui/components/video-grid-card";
-import { VideoRowCard , VideoRowCardSkleton} from "@/modules/videos/ui/components/video-row-card";
+import {
+  VideoRowCard,
+  VideoRowCardSkleton,
+} from "@/modules/videos/ui/components/video-row-card";
 import { trpc } from "@/trpc/client";
 import { Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
@@ -31,12 +34,12 @@ export const LikedVideoSectionSkleton = () => {
           <VideoGridCardSkeleton key={index} />
         ))}
       </div>
-       <div
+      <div
         className="hidden  flex-col gap-4  md:flex
     "
       >
         {Array.from({ length: 18 }).map((_, index) => (
-          <VideoRowCardSkleton key={index}  size="compact"/>
+          <VideoRowCardSkleton key={index} size="compact" />
         ))}
       </div>
     </div>
@@ -65,7 +68,7 @@ export const LikedVideosSectionSuspense = () => {
             <VideoGridCard key={video.id} data={video} />
           ))}
       </div>
-            <div
+      <div
         className=" hidden  flex-col gap-4  md:flex
     "
       >

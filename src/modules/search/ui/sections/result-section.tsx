@@ -75,7 +75,7 @@ export const ResultSectionSuspense = ({
             ))}
         </div>
  
-        <div className="hidden flex flex-col gap-4 md:flex">
+        <div className="hidden  flex-col gap-4 md:flex">
           {results.pages
             .flatMap((page) => page.items)
             .map((video) => (

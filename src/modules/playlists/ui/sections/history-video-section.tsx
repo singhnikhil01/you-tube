@@ -10,6 +10,7 @@ import { trpc } from "@/trpc/client";
 import { Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 
+
 export const HistoryVideosSection = () => {
   return (
     <Suspense fallback={<HistoryVideoSectionSkleton />}>
