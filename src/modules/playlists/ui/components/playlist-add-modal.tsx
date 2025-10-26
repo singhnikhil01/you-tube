@@ -1,89 +1,125 @@
-"use client"
 import React from "react";
 import { ResponsiveModal } from "@/components/responsive-modal";
 import { trpc } from "@/trpc/client";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { DEFAULT_LIMIT } from "@/constants";
+import { Loader2Icon, SquareCheckIcon, SquareIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { z } from "zod";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { InfiniteScroll } from "@/components/infinite-scroll";
 import { toast } from "sonner";
-import { Input } from "@/components/ui/input";
 
 interface PlaylistAddModalProps {
   open: boolean;
   onOpenchange: (open: boolean) => void;
+  videoId: string;
 }
-const formSchema = z.object({
-  name: z.string().min(1),
-});
 
 export const PlaylistAddModal = ({
   open,
   onOpenchange,
+  videoId,
 }: PlaylistAddModalProps) => {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: "",
-    },
-  });
-
-  const { handleSubmit } = form;
-
   const utils = trpc.useUtils();
-  const create = trpc.playlists.create.useMutation({
-    onSuccess: () => {
+  const {
+    data: playlists,
+    isLoading,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+  } = trpc.playlists.getManyForVideo.useInfiniteQuery(
+    {
+      videoId,
+      limit: DEFAULT_LIMIT,
+    },
+    {
+      getNextPageParam: (lastPage) => lastPage.nextCursor,
+      enabled: !!videoId && open,
+    }
+  );
+
+  const addVideo = trpc.playlists.addVideo.useMutation({
+    onSuccess: (data) => {
+      toast.success("Video added to playlist");
       utils.playlists.getMany.invalidate();
-      toast.success("Playlist created", {});
-      form.reset();
-      onOpenchange(false);
+      utils.playlists.getManyForVideo.invalidate({
+        videoId,
+      });
+
+      //TODO: revalidate playlists playlists.getOne
     },
     onError: () => {
       toast.error("something went wrong");
     },
   });
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    create.mutate(values);
-    onOpenchange(false);
+  const removeVideo = trpc.playlists.removeVideo.useMutation({
+    onSuccess: () => {
+      toast.success("Video removed from playlist");
+      utils.playlists.getMany.invalidate();
+      utils.playlists.getManyForVideo.invalidate({
+        videoId,
+      });
+    },
+    onError: () => {
+      toast.error("something went wrong");
+    },
+  });
+
+  const handleOpenChange = (newopen: boolean) => {
+    utils.playlists.getManyForVideo.reset({
+      videoId,
+      limit: DEFAULT_LIMIT,
+    });
+    onOpenchange(newopen);
   };
 
   return (
     <ResponsiveModal
-      title="Create a playlist"
+      title="Add to playlist"
       open={open}
-      onOpenChange={onOpenchange}
+      onOpenChange={handleOpenChange}
     >
-      <Form {...form}>
-        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Prompt</FormLabel>
-                <FormControl>
-                  <Input {...field} placeholder="My favourite Videos" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <div className="flex justify-end">
-            <Button type="submit" disabled={create.isPending}>
-              Create
-            </Button>
+      <div className="flex flex-col gap-2">
+        {isLoading && (
+          <div className="flex justify-center p-4">
+            <Loader2Icon className="animate-spin size-5 text-muted-foreground" />
           </div>
-        </form>
-      </Form>
+        )}
+
+        {!isLoading &&
+          playlists?.pages
+            .flatMap((page) => page.items)
+            .map((playlist) => (
+              <Button
+                key={playlist.id}
+                variant={"ghost"}
+                className="w-full justify-start px-2 [&_svg]:size-5 "
+                size={"lg"}
+                onClick={() => {
+                  if (playlist.containsVideo) {
+                    removeVideo.mutate({ playlistId: playlist.id, videoId });
+                  } else {
+                    addVideo.mutate({ playlistId: playlist.id, videoId });
+                  }
+                }}
+                disabled={addVideo.isPending || removeVideo.isPending}
+              >
+                {playlist.containsVideo ? (
+                  <SquareCheckIcon className="mr-2" />
+                ) : (
+                  <SquareIcon className="mr-r" />
+                )}
+                {playlist.name}
+              </Button>
+            ))}
+        {!isLoading && (
+          <InfiniteScroll
+            hasNextPage={hasNextPage}
+            isFetchingNextPage={isFetchingNextPage}
+            fetchNextPage={fetchNextPage}
+            isManual
+          />
+        )}
+      </div>
     </ResponsiveModal>
   );
 };

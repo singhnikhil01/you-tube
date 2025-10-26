@@ -8,6 +8,7 @@ const Page = async () => {
   return (
     <HydrateClient>
       <PlaylistsView />
+      {/* <div>Nothing to show</div> */}
     </HydrateClient>
   );
 };
