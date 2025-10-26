@@ -1,106 +1,151 @@
-# new-tube
+ # you-tube
 
-[![Built with TypeScript](https://img.shields.io/badge/Built%20with-TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Built with React](https://img.shields.io/badge/Built%20with-React-61DAFB?style=for-the-badge&logo=react&logoColor=white)](https://reactjs.org/)
-[![Styled with Tailwind CSS](https://img.shields.io/badge/Styled%20with-Tailwind%20CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
-[![Built with Node.js](https://img.shields.io/badge/Built%20with-Node.js-339933?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
-[![Language](https://img.shields.io/badge/Language-TypeScript-yellow.svg?style=for-the-badge)](https://en.wikipedia.org/wiki/Programming_language)
-[![Version](https://img.shields.io/badge/version-TypeScript-blue.svg?style=for-the-badge)]()
+Modern YouTube-clone web app built with Next.js (app router), TypeScript, Tailwind and a handful of production-ready services.
 
-`new-tube` is a project aimed at creating a functional clone of the popular video-sharing platform, YouTube. It leverages modern web technologies to provide a responsive and interactive user experience.
+This README summarizes the project's purpose, core technologies, how to run locally, key folders, and required environment configuration.
 
-## Table of Contents
+## Key highlights
 
-- [Features](#features)
-- [Technologies Used](#technologies-used)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Contributing](#contributing)
-- [License](#license)
+- Framework: Next.js (app router) — Next 15
+- Language: TypeScript
+- Styling: Tailwind CSS
+- Auth: Clerk (@clerk/nextjs)
+- API: tRPC
+- ORM: Drizzle (drizzle-kit + drizzle-orm)
+- Storage / Video: Mux + @mux/mux-uploader-react, Uploadthing
+- Database: Postgres/Neon (via DATABASE_URL)
+- Cache / Rate limiting: Upstash Redis
 
-## Features
+## Table of contents
 
-Based on the project description and included technologies, `new-tube` is being built with features common to video-sharing platforms. Potential features include:
+- What this repo contains
+- Quick start (run locally)
+- Environment variables
+- Scripts
+- Project layout (important folders)
+- Notes & troubleshooting
+- Contributing
 
-*   User Authentication (powered by Clerk)
-*   Video Upload and Management
-*   Video Playback
-*   Comment Section
-*   Search Functionality
-*   Responsive Design
-*   Database Integration (using Neon serverless database)
+## What this repo contains
 
-*(Note: The exact implemented features may vary based on the current development state.)*
+This is a full-stack Next.js app using the App Router under `src/app`. The codebase contains UI components, API routes (tRPC), Drizzle schemas, and integrations for uploads and video playback.
 
-## Technologies Used
+Notable packages (from package.json):
 
-This project is built using the following key technologies and libraries:
+- @clerk/nextjs — authentication
+- @trpc/* — typed backend/frontend RPC
+- drizzle-orm / drizzle-kit — DB layer
+- @mux/mux-node & mux-player-react — video encoding & playback
+- @uploadthing/react / uploadthing — file upload helpers
+- @neondatabase/serverless — adapter for Neon
+- @upstash/redis, @upstash/ratelimit — Redis + rate limiting
+- tailwindcss, sonner, radix-ui — styling & UI primitives
 
-*   TypeScript
-*   Node.js
-*   Next.js (implicitly used via `create-next-app` and project structure)
-*   React (implicitly used via Next.js)
-*   Tailwind CSS
-*   @clerk/nextjs (for authentication)
-*   @hookform/resolvers (for form validation)
-*   @neondatabase/serverless (for database interactions)
-*   @radix-ui/* (various components like accordion, alert-dialog, aspect-ratio, avatar, checkbox, etc.)
-*   Drizzle ORM 
-*   And many more...
+## Quick start (local development)
 
-## Installation
+Prerequisites
 
-To get a local copy up and running, follow these steps:
+- bun (recommended by repo scripts) or Node.js + npm/yarn
+- environment variables set in `.env.local` (see below)
+- optionally ngrok for webhook tunnels if you need webhooks locally
 
-1.  Clone the repository:
-    ```bash
-    git clone https://github.com/singhnikhil01/new-tube.git # Replace with actual repo URL
-    ```
-2.  Navigate to the project directory:
-    ```bash
-    cd new-tube
-    ```
-3.  Install dependencies using Bun:
-    ```bash
-    bun install
-    ```
-4.  Set up environment variables. You will likely need configuration for Clerk, Neon Database, Ngrok (for webhooks), etc. Create a `.env.local` file in the root directory and add necessary variables (refer to `.env.example` if available, or relevant documentation for the used services).
+Install dependencies
 
 ```bash
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
-CLERK_SECRET_KEY=
-NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
-NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
-NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL=/
-NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL=/
-CLERK_SIGNING_SECRET=
-DATABASE_URL=
-UPSTASH_REDIS_REST_URL=
-UPSTASH_REDIS_REST_TOKEN=
-MUX_TOKEN_SECRET=
-MUX_TOKEN_ID=
-MUX_WEBHOOK_SECRET=
-UPLOADTHING_TOKEN=
+bun install
 ```
 
-## Usage
+Run the dev server
 
-To run the project locally:
+```bash
+# runs next dev
+bun run dev
 
-*   For basic development server:
-    ```bash
-    bun run dev:all
-    ```
-    Open [http://localhost:3000](http://localhost:3000) in your browser.
-*   If your application relies on webhooks (e.g., for Clerk or other services) and requires a publicly accessible URL for local development, you may need to run the webhook tunnel alongside the development server. A convenience script `dev:all` is provided:
-    ```bash
-    bun run dev:all
-    ```
-    *(Note: The `dev:webhook` script currently uses a hardcoded ngrok URL (`dashing-flamingo-vastly.ngrok-free.app`). You may need to configure Ngrok or a similar tool and update the script or `.env` variables accordingly).*
+# or run the helper that attempts to run a webhook tunnel + dev server
+bun run dev:all
+```
 
-For production build:
+Build & start (production)
 
 ```bash
 bun run build
 bun run start
 ```
+
+Open http://localhost:3000 after the dev server starts.
+
+## Environment variables
+
+Create a `.env.local` in the repo root and add the values required by your services. The project references these (non-exhaustive list):
+
+- DATABASE_URL — Postgres / Neon connection string used by Drizzle
+- NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY — Clerk (client)
+- CLERK_SECRET_KEY — Clerk (server)
+- CLERK_SIGNING_SECRET — Clerk webhook signing secret
+- UPSTASH_REDIS_REST_URL — Upstash Redis URL
+- UPSTASH_REDIS_REST_TOKEN — Upstash Redis token
+- MUX_TOKEN_ID — Mux token id
+- MUX_TOKEN_SECRET — Mux token secret
+- MUX_WEBHOOK_SECRET — Mux webhook secret
+- UPLOADTHING_TOKEN or UPLOADTHING_SECRET — Uploadthing auth
+- NEXT_PUBLIC_APP_URL — Public app URL (defaults to http://localhost:3000)
+
+Tip: Some services also require configuring webhooks (Clerk / Mux). For local webhook testing you can use ngrok and update `scripts.dev:webhook` or set the webhook URL in the service dashboard.
+
+## Scripts (from package.json)
+
+- `dev` — start Next.js dev server (next dev)
+- `dev:all` — runs `dev:webhook` and `dev` concurrently (uses `concurrently`)
+- `dev:webhook` — currently runs an ngrok command with a hardcoded URL; update before use
+- `build` — next build
+- `start` — next start (production)
+- `lint` — next lint
+
+Inspect `package.json` for the exact definitions.
+
+## Project layout (top-level of `src/`)
+
+- `src/app/` — Next app router pages/layouts (app entrypoints and routes)
+- `src/components/` — shared UI components and primitives
+- `src/db/` — Drizzle schema & DB helpers
+- `src/modules/` — domain modules (auth, videos, comments, playlists, etc.)
+- `src/lib/` — helper libraries (mux helpers, qstash, redis, upload helpers)
+- `src/trpc/` — tRPC client/server initialization and routers
+
+Example: `src/app/layout.tsx` wires up `ClerkProvider`, the tRPC provider, and global styles.
+
+## Notes & troubleshooting
+
+- The repository uses Next 15 and experimental App Router conventions — files under `src/app` are the primary routes/layouts.
+- `drizzle.config.ts` expects `DATABASE_URL` in `.env.local`; run `drizzle-kit` if you need migrations.
+- `dev:webhook` script has a hardcoded ngrok URL; replace it with a dynamic ngrok command or remove it if you prefer manual tunneling.
+- If you get CORS or image remote errors, check `next.config.ts` which whitelists certain host patterns for Next Image.
+
+Common quick fixes
+
+- Lint/type issues: run `bun run lint` and check `tsc` diagnostics locally.
+- If uploads fail, verify Uploadthing and Mux env vars and check network rules.
+
+## Contributing
+
+Contributions are welcome. A suggested workflow:
+
+1. Fork the repo
+2. Create a feature branch and open a PR with a clear description
+3. Add tests for new behavior where applicable
+
+If you want me to also add a small .env.example or contributor guide, tell me which services you want included and I will generate it.
+
+## License
+
+This repository does not contain an explicit license file. Add `LICENSE` if you intend to open-source it.
+
+---
+
+If you'd like, I can also:
+
+- add a `.env.example` with common keys (no secrets)
+- add a short CONTRIBUTING.md
+- add a developer checklist for setting up Mux / Uploadthing / Clerk locally
+
+Tell me which of the above you'd like next.
