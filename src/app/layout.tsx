@@ -9,7 +9,7 @@ import { Toaster } from "@/components/ui/sonner";
 // const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "NewTube",
+  title: "YouTube",
   description: "Youtube Clone",
   icons: "/logo.svg",
 };
