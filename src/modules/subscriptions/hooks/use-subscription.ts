@@ -13,18 +13,15 @@ interface UseSubscriptionProps {
 export const useSubscription = ({
   userId,
   isSubscribed,
-  fromVideoId,
 }: UseSubscriptionProps) => {
   const clerk = useClerk();
   const utils = trpc.useUtils();
   const subscribe = trpc.subscriptions.create.useMutation({
     onSuccess: () => {
       toast.success("Subscribed successfully");
-      //TODO: revalidate subscriptions.getMany, users.getOne and videos.getOne
-      if (fromVideoId) {
-        utils.videos.getOne.invalidate({ id: fromVideoId });
-        utils.videos.getManySubscribed.invalidate()
-      }
+
+      utils.videos.getOne.invalidate({ id: userId });
+      utils.videos.getManySubscribed.invalidate();
     },
     onError: (error) => {
       toast.error("something went wrong");
@@ -36,8 +33,8 @@ export const useSubscription = ({
   const unsubscribe = trpc.subscriptions.remove.useMutation({
     onSuccess: () => {
       toast.success("Unsubscribed successfully");
-      utils.videos.getManySubscribed.invalidate()
-      utils.videos.getOne.invalidate({ id: fromVideoId })
+      utils.videos.getManySubscribed.invalidate();
+      utils.videos.getOne.invalidate({ id: userId });
     },
     onError: (error) => {
       toast.error("something went wrong");

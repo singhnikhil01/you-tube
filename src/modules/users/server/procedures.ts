@@ -2,9 +2,7 @@ import { db } from "@/db";
 import {
   subscriptions,
   users,
-  videoReactions,
   videos,
-  videoViews,
 } from "@/db/schema";
 
 import { createTRPCRouter, baseProcedure } from "@/trpc/init";
@@ -27,16 +25,6 @@ export const UsersRouter = createTRPCRouter({
         userId = user.id;
       }
 
-      const viewerReactions = db.$with("viewer_reactions").as(
-        db
-          .select({
-            videoId: videoReactions.videoId,
-            type: videoReactions.type,
-          })
-          .from(videoReactions)
-          .where(inArray(videoReactions.userId, userId ? [userId] : []))
-      );
-
       const viewerSubscriptions = db.$with("viewer_subscriptions").as(
         db
           .select()
@@ -44,55 +32,31 @@ export const UsersRouter = createTRPCRouter({
           .where(inArray(subscriptions.viewerId, userId ? [userId] : []))
       );
 
-      const [existingvideo] = await db
-        .with(viewerReactions, viewerSubscriptions)
+      const [existingUser] = await db
+        .with(viewerSubscriptions)
         .select({
-          ...getTableColumns(videos),
-          user: {
-            ...getTableColumns(users),
-            subscriberCount: db.$count(
-              subscriptions,
-              eq(subscriptions.creatorId, users.id)
-            ),
-            viewerSubscribed: isNotNull(viewerSubscriptions.viewerId).mapWith(
-              Boolean
-            ),
-          },
-          viewCount: db.$count(videoViews, eq(videoViews.videoId, videos.id)),
-          likeCount: db.$count(
-            videoReactions,
-            and(
-              eq(videoReactions.videoId, videos.id),
-              eq(videoReactions.type, "like")
-            )
+          ...getTableColumns(users),
+          viewerSubscribed: isNotNull(viewerSubscriptions.viewerId).mapWith(
+            Boolean
           ),
-
-          dislikeCount: db.$count(
-            videoReactions,
-            and(
-              eq(videoReactions.videoId, videos.id),
-              eq(videoReactions.type, "dislike")
-            )
+          videoCount: db.$count(videos, eq(videos.userId, users.id)),
+          subscriberCount: db.$count(
+            subscriptions,
+            eq(subscriptions.creatorId, users.id)
           ),
-
-          viewerReaction: viewerReactions.type, // This will be null if the user has not reacted
         })
-        .from(videos)
-        .innerJoin(users, eq(videos.userId, users.id))
-        .leftJoin(viewerReactions, eq(viewerReactions.videoId, videos.id))
+
+        .from(users)
         .leftJoin(
           viewerSubscriptions,
-          eq(viewerSubscriptions.creatorId, videos.userId)
+          eq(viewerSubscriptions.creatorId, users.id)
         )
-        .where(and(eq(videos.id, input.id)));
-      // .groupBy(videos.id, users.id, viewerReactions.type);
+        .where(and(eq(users.id, input.id)));
 
-      if (!existingvideo) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Video not found",
-        });
+      if (!existingUser) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
       }
-      return existingvideo;
+
+      return existingUser;
     }),
 });

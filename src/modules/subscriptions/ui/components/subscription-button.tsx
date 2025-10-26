@@ -7,7 +7,7 @@ interface SuscriptionButtonProps {
   disabled: boolean;
   isSubscribed: boolean;
   className?: string;
-  size: ButtonProps["size"];
+  size?: ButtonProps["size"];
 }
 
 export const SubscriptionButton = ({

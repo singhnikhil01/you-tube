@@ -207,7 +207,8 @@ export const VideosRouter = createTRPCRouter({
   getMany: baseProcedure
     .input(
       z.object({
-        categoryId: z.string().uuid().optional().nullable(),
+        categoryId: z.string().uuid().optional().nullish(),
+        userId: z.string().uuid().optional().nullish(),
         cursor: z
           .object({
             id: z.string().uuid(),
@@ -218,12 +219,16 @@ export const VideosRouter = createTRPCRouter({
       })
     )
     .query(async ({ input }) => {
-      const { cursor, limit, categoryId } = input;
+      const { cursor, limit, categoryId, userId } = input;
       const filters = [];
 
       // Category filter
       if (categoryId) {
         filters.push(eq(videos.categoryId, categoryId));
+      }
+
+      if (userId) {
+        filters.push(eq(videos.userId, userId));
       }
 
       // Cursor pagination logic

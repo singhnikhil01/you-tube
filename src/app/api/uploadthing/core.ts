@@ -9,6 +9,48 @@ import { and, eq } from "drizzle-orm";
 const f = createUploadthing();
 
 export const ourFileRouter = {
+  bannerUploader: f({
+    image: {
+      maxFileSize: "4MB",
+      maxFileCount: 1,
+    },
+  })
+    .middleware(async () => {
+      const { userId: clerkUserId } = await auth();
+      if (!clerkUserId) throw new UploadThingError("Unauthorized");
+
+      const [user] = await db
+        .select()
+        .from(users)
+        .where(eq(users.clerkId, clerkUserId));
+
+      if (!user) {
+        throw new UploadThingError("Unauthorized");
+      }
+
+      if (user.bannerKey) {
+        const utapi = new UTApi();
+        await utapi.deleteFiles(user.bannerKey);
+        await db
+          .update(users)
+          .set({ bannerKey: null, bannerUrl: null })
+          .where(eq(users.id, user.id));
+      }
+
+      return { userId: user.id };
+    })
+    .onUploadComplete(async ({ file, metadata }) => {
+      await db
+        .update(users)
+        .set({
+          bannerUrl: file.ufsUrl, // Changed from file.ufsUrl
+          bannerKey: file.key,
+        })
+        .where(eq(users.id, metadata.userId));
+
+      return { uploadedBy: metadata.userId };
+    }),
+
   thumbnailUploader: f({
     image: {
       maxFileSize: "4MB",
