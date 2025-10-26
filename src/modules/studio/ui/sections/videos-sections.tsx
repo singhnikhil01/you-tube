@@ -147,7 +147,7 @@ export const VideosSectionSuspense = () => {
                         {video.visibility == "private" ? (
                           <LockIcon className="size-4 mr-2" />
                         ) : (
-                          <Globe2Icon className="size-4 mr-2" /> 
+                          <Globe2Icon className="size-4 mr-2" />
                         )}
                         {snakeCaseToTitle(video.visibility)}
                       </div>
@@ -160,12 +160,14 @@ export const VideosSectionSuspense = () => {
                     <TableCell className="text-sm truncate">
                       {format(new Date(video.createdAt), "dd MMM yyyy")}
                     </TableCell>
-                    <TableCell className="text-right text-sm">views</TableCell>
                     <TableCell className="text-right text-sm">
-                      comments
+                      {video.viewCount}
+                    </TableCell>
+                    <TableCell className="text-right text-sm">
+                      {video.commentCount}
                     </TableCell>
                     <TableCell className="text-right text-sm pr-6">
-                      Likes
+                      {video.likeCount}
                     </TableCell>
                   </TableRow>
                 </Link>

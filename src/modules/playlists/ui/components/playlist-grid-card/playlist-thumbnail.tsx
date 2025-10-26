@@ -9,7 +9,7 @@ interface PlaylistThumbnailProps {
   title: string;
   videoCount: number;
   className?: string;
-  thumbnailiUrl?: string | null;
+  thumbnailUrl?: string | null;
 }
 
 export const PlaylistThumbnailSkleton = () => {
@@ -24,7 +24,7 @@ export const PlaylistThumbnail = ({
   title,
   videoCount,
   className,
-  thumbnailiUrl,
+  thumbnailUrl,
 }: PlaylistThumbnailProps) => {
   const compactViews = useMemo(() => {
     return Intl.NumberFormat("en", {
@@ -44,7 +44,7 @@ export const PlaylistThumbnail = ({
 
         <div className="relative overflow-hidden w-full rounded-xl aspect-video">
           <Image
-            src={thumbnailiUrl || THUMBNAIL_FALLBACK}
+            src={thumbnailUrl || THUMBNAIL_FALLBACK}
             alt={title}
             className="w-full h-full object-cover"
             fill

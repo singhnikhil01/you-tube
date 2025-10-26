@@ -1,8 +1,14 @@
 import { db } from "@/db";
-import { videos } from "@/db/schema";
+import {
+  comments,
+  users,
+  videoReactions,
+  videos,
+  videoViews,
+} from "@/db/schema";
 import { protectedProcedure, createTRPCRouter } from "@/trpc/init";
 import { z } from "zod";
-import { eq, and, or, lt, desc } from "drizzle-orm";
+import { eq, and, or, lt, desc, getTableColumns } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 
 export const studioRouter = createTRPCRouter({
@@ -54,8 +60,21 @@ export const studioRouter = createTRPCRouter({
         : baseCondition;
 
       const data = await db
-        .select()
+        .select({
+          ...getTableColumns(videos),
+          viewCount: db.$count(videoViews, eq(videoViews.videoId, videos.id)),
+          likeCount: db.$count(
+            videoReactions,
+            and(
+              eq(videoReactions.videoId, videos.id),
+              eq(videoReactions.type, "like")
+            )
+          ),
+          commentCount: db.$count(comments, eq(comments.videoId, videos.id)),
+          user: users,
+        })
         .from(videos)
+        .innerJoin(users, eq(users.id, videos.userId))
         .where(finalCondition)
         .orderBy(desc(videos.updatedAt), desc(videos.id))
         .limit(limit + 1); // Fetch one extra to check for next page
