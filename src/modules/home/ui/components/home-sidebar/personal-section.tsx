@@ -15,13 +15,13 @@ import { usePathname } from "next/navigation";
 const items = [
   {
     title: "History",
-    url: "/playlist/history",
+    url: "/playlists/history",
     icon: History,
     auth:true
   },
   {
     title: "Liked Videos",
-    url: "/playlist/liked",
+    url: "/playlists/liked",
     icon:ThumbsUpIcon,
     auth: true,
   },

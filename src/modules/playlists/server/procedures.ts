@@ -1,15 +1,106 @@
 import { db } from "@/db";
+import { TRPCError } from "@trpc/server";
 import {
+  playlists,
   users,
   videoReactions,
   videos,
   videoViews,
+  playlistVideos,
 } from "@/db/schema";
 import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 import { and, desc, eq, getTableColumns, lt, or } from "drizzle-orm";
 import z from "zod";
 
 export const PlaylistsRouter = createTRPCRouter({
+  getMany: protectedProcedure
+    .input(
+      z.object({
+        cursor: z
+          .object({
+            id: z.string().uuid(),
+            updatedAt: z.string().datetime(),
+          })
+          .optional(),
+        limit: z.number().min(1).max(100),
+      })
+    )
+    .query(async ({ input, ctx }) => {
+      const { id: userId } = ctx.user;
+      const { cursor, limit } = input;
+
+      const baseWhere = eq(playlists.userId, userId);
+
+      const paginationWhere = cursor
+        ? or(
+            lt(playlists.updatedAt, new Date(cursor.updatedAt)),
+            and(
+              eq(playlists.updatedAt, new Date(cursor.updatedAt)),
+              lt(playlists.id, cursor.id)
+            )
+          )
+        : undefined;
+
+      const finalWhere = paginationWhere
+        ? and(baseWhere, paginationWhere)
+        : baseWhere;
+
+      const data = await db
+        .select({
+          ...getTableColumns(playlists),
+          videoCount: db.$count(
+            playlistVideos,
+            eq(playlists.id, playlistVideos.playlistId)
+          ),
+          user: users,
+        })
+        .from(playlists)
+        .innerJoin(users, eq(playlists.userId, users.id))
+        .where(finalWhere)
+        .orderBy(desc(playlists.updatedAt), desc(playlists.id))
+        .limit(limit + 1);
+
+      const hasMore = data.length > limit;
+      const items = hasMore ? data.slice(0, -1) : data;
+      const lastItem = items.at(-1);
+
+      const nextCursor =
+        hasMore && lastItem
+          ? {
+              id: lastItem.id,
+              updatedAt: lastItem.updatedAt.toISOString(),
+            }
+          : null;
+
+      return {
+        items,
+        nextCursor,
+      };
+    }),
+
+  create: protectedProcedure
+    .input(
+      z.object({
+        name: z.string().min(1),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const { name } = input;
+      const { id: userId } = ctx.user;
+      const [createdPlaylist] = await db
+        .insert(playlists)
+        .values({
+          userId,
+          name,
+        })
+        .returning();
+
+      if (!createdPlaylist) {
+        throw new TRPCError({ code: "BAD_REQUEST" });
+      }
+      return createdPlaylist;
+    }),
+
   getLiked: protectedProcedure
     .input(
       z.object({
@@ -81,7 +172,10 @@ export const PlaylistsRouter = createTRPCRouter({
         })
         .from(videos)
         .innerJoin(users, eq(videos.userId, users.id))
-        .innerJoin(viewerVideoReactions, eq(videos.id, viewerVideoReactions.videoId))
+        .innerJoin(
+          viewerVideoReactions,
+          eq(videos.id, viewerVideoReactions.videoId)
+        )
         .where(filters.length > 0 ? and(...filters) : undefined)
         .orderBy(desc(viewerVideoReactions.likedAt), desc(videos.id))
         .limit(limit + 1);
@@ -103,7 +197,6 @@ export const PlaylistsRouter = createTRPCRouter({
         nextCursor,
       };
     }),
-
 
   getHistory: protectedProcedure
     .input(
