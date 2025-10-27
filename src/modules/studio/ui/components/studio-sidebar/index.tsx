@@ -25,7 +25,7 @@ export const StudioSidebar = () => {
       <SidebarContent className="bg-white ">
         <div  className={state==="collapsed" ? "invisible" : "flex items-center flex-shrink-0"}>
           <SidebarTrigger />
-          <Link href="/studio" >
+          <Link prefetch  href="/studio" >
             <div className="p-4 flex items-center gap-1">
               <Image src="/logo.svg" height={32} width={32} alt="log0" />
               <p className="text-xl font-semibold tracking-tight">Studio</p>
@@ -41,7 +41,7 @@ export const StudioSidebar = () => {
                 tooltip="Edit studio"
                 asChild
               >
-                <Link href={"/studio"}>
+                <Link prefetch  href={"/studio"}>
                   <VideoIcon className="size-5" />
                   <span className="text-sm">Content</span>
                 </Link>
@@ -53,7 +53,7 @@ export const StudioSidebar = () => {
                 tooltip="Edit studio"
                 asChild
               >
-                <Link href={"/"}>
+                <Link prefetch  href={"/"}>
                   <LogOutIcon className="size-5" />
                   <span className="text-sm">Exit studio</span>
                 </Link>

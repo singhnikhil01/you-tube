@@ -485,7 +485,7 @@ export const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
                     <div className="flex flex-col gap-y-1">
                       <p className="text-muted-foreground">Video link</p>
                       <div className="flex items-center gap-x-2">
-                        <Link href={`/video/${video.id}`} className="">
+                        <Link prefetch  href={`/video/${video.id}`} className="">
                           <p className="line-clamp-1 text-sm text-blue-500 hover:underline">
                             {fullUrl}
                           </p>

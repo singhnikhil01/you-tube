@@ -1,6 +1,11 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
-const isProtectedRouted = createRouteMatcher(["/studio(.*)", "/api/trpc(.*)"]);
+const isProtectedRouted = createRouteMatcher([
+  "/studio(.*)",
+  "/subscriptions",
+  "/feed/subscribed",
+  "/playlists(.*)",
+]);
 
 export default clerkMiddleware(async (auth, req) => {
   if (isProtectedRouted(req)) await auth.protect();
@@ -8,11 +13,10 @@ export default clerkMiddleware(async (auth, req) => {
 
 export const config = {
   matcher: [
-
-    //skip Next.js internals  and alll static  files unless  found in search params 
+    //skip Next.js internals  and alll static  files unless  found in search params
     "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
 
-    //Always run for the API routes 
+    //Always run for the API routes
     "/(api|trpc)(.*)",
   ],
 };
