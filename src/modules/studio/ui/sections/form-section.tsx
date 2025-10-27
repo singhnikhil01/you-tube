@@ -188,8 +188,6 @@ export const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
     },
   });
 
-
-
   const generateTitle = trpc.videos.generateTitle.useMutation({
     onSuccess: () => {
       toast.success("Background job started", {
@@ -222,7 +220,7 @@ export const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
     form.reset(data);
   };
 
-  const fullUrl = APP_URL
+  const fullUrl = `${APP_URL}/video/${video.id}`;
 
   const [isCopied, setIsCopied] = useState(false);
   const onCopy = async () => {
@@ -246,7 +244,7 @@ export const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
 
   return (
     <>
-     <ThumbnailGenerateModal
+      <ThumbnailGenerateModal
         open={thumbnailGenerateModalOpen}
         onOpenchange={setThumbnailGenerateOpen}
         videoId={videoId}
@@ -256,7 +254,7 @@ export const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
         onOpenchange={setThumbnailModelOpen}
         videoId={videoId}
       />
-     
+
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <div className="flex items-center justify-between mb-6">
@@ -279,17 +277,17 @@ export const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                <DropdownMenuItem
+                  <DropdownMenuItem
                     onClick={() => revalidate.mutate({ id: video.id })}
                   >
                     <RotateCcwIcon className="size-4  mr-2" />
-                     Revalidate
+                    Revalidate
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => remove.mutate({ id: video.id })}
                   >
                     <TrashIcon className="size-4  mr-2" />
-                     Delete
+                    Delete
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -414,9 +412,7 @@ export const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
                               Change
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                              onClick={() =>
-                                setThumbnailGenerateOpen(true)
-                              }
+                              onClick={() => setThumbnailGenerateOpen(true)}
                             >
                               <SparklesIcon className="size-4 mr-1" />
                               AI Generated
@@ -484,7 +480,7 @@ export const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
                     <div className="flex flex-col gap-y-1">
                       <p className="text-muted-foreground">Video link</p>
                       <div className="flex items-center gap-x-2">
-                        <Link prefetch  href={`/video/${video.id}`} className="">
+                        <Link prefetch href={`/video/${video.id}`} className="">
                           <p className="line-clamp-1 text-sm text-blue-500 hover:underline">
                             {fullUrl}
                           </p>
